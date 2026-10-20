@@ -1,0 +1,602 @@
+msgid ""
+msgstr "Project-Id-Version: Georg Kloster Bible Reader 1.1.10\nContent-Type: text/plain; charset=UTF-8\n"
+
+msgid "API privacy policy"
+msgstr ""
+
+msgid "API terms"
+msgstr ""
+
+msgid "Add a note"
+msgstr ""
+
+msgid "Add favorite"
+msgstr ""
+
+msgid "Add the reader to your site"
+msgstr ""
+
+msgid "Afro-Asiatic"
+msgstr ""
+
+msgid "All"
+msgstr ""
+
+msgid "All groups"
+msgstr ""
+
+msgid "All languages"
+msgstr ""
+
+msgid "Already cached chapters remain available when Bible Desktop is unavailable."
+msgstr ""
+
+msgid "Arawakan"
+msgstr ""
+
+msgid "Atlantic-Congo"
+msgstr ""
+
+msgid "Audio"
+msgstr ""
+
+msgid "Audio is not available for this text."
+msgstr ""
+
+msgid "Austroasiatic"
+msgstr ""
+
+msgid "Austronesian"
+msgstr ""
+
+msgid "Back"
+msgstr ""
+
+msgid "Background download queued. Existing cached text remains available."
+msgstr ""
+
+msgid "Bad nonce"
+msgstr ""
+
+msgid "Bible"
+msgstr ""
+
+msgid "Bible Desktop is temporarily unavailable. Please try again later."
+msgstr ""
+
+msgid "Bible Desktop modules"
+msgstr ""
+
+msgid "Bible Desktop supplies public Bible texts, commentary, dictionaries, and maps. Requests are sent by this WordPress server and include its IP address, requested references, and search words. Visitor IP addresses, accounts, bookmarks, and reading history are not sent to Bible Desktop."
+msgstr ""
+
+msgid "Bible Passage"
+msgstr ""
+
+msgid "Bible Reader"
+msgstr ""
+
+msgid "Bible library"
+msgstr ""
+
+msgid "Blue"
+msgstr ""
+
+msgid "Book"
+msgstr ""
+
+msgid "Bookmark verse"
+msgstr ""
+
+msgid "Bookmarks and history stay in this browser."
+msgstr ""
+
+msgid "Books"
+msgstr ""
+
+msgid "Browser storage is unavailable."
+msgstr ""
+
+msgid "Chapter"
+msgstr ""
+
+msgid "Chapter labels"
+msgstr ""
+
+msgid "Chapter:verse"
+msgstr ""
+
+msgid "Chapters are cached for one year; study texts for 90 days. Catalogs are checked daily. Cached content is retained during outages. Changed content revisions refresh chapters on demand. Manual refresh replaces each response only after a successful download. WordPress scheduled tasks need site visits or a configured cron runner."
+msgstr ""
+
+msgid "Check module"
+msgstr ""
+
+msgid "Choose a translation and passage in the block settings."
+msgstr ""
+
+msgid "Choose a translation enabled by the administrator."
+msgstr ""
+
+msgid "Choose book, chapter and verse"
+msgstr ""
+
+msgid "Clean text"
+msgstr ""
+
+msgid "Clear local bookmarks and history"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+msgid "Collection"
+msgstr ""
+
+msgid "Commentary"
+msgstr ""
+
+msgid "Compare translation"
+msgstr ""
+
+msgid "Comparison follows stored verse IDs. Unverified source numbering may differ, especially in Psalms."
+msgstr ""
+
+msgid "Complete"
+msgstr ""
+
+msgid "Connect Bible Desktop in the reader settings first."
+msgstr ""
+
+msgid "Continuous reading"
+msgstr ""
+
+msgid "Copy link"
+msgstr ""
+
+msgid "Could not load this material. Please try again later."
+msgstr ""
+
+msgid "Cross references"
+msgstr ""
+
+msgid "Default translation"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "Dictionaries and maps"
+msgstr ""
+
+msgid "Dictionary entry is not imported yet."
+msgstr ""
+
+msgid "Display and controls"
+msgstr ""
+
+msgid "Download selected Bibles"
+msgstr ""
+
+msgid "Download: %1$d of %2$d chapters. Status: %3$s."
+msgstr ""
+
+msgid "Dravidian"
+msgstr ""
+
+msgid "Enable other dictionaries"
+msgstr ""
+
+msgid "Existing local modules"
+msgstr ""
+
+msgid "Exit full screen"
+msgstr ""
+
+msgid "Export personal study"
+msgstr ""
+
+msgid "Favorite translations"
+msgstr ""
+
+msgid "File"
+msgstr ""
+
+msgid "Filter translations"
+msgstr ""
+
+msgid "First selected translation"
+msgstr ""
+
+msgid "First verse"
+msgstr ""
+
+msgid "Forbidden"
+msgstr ""
+
+msgid "Format"
+msgstr ""
+
+msgid "Forward"
+msgstr ""
+
+msgid "From chapter:verse"
+msgstr ""
+
+msgid "Full screen"
+msgstr ""
+
+msgid "Georg Kloster Bible Reader"
+msgstr ""
+
+msgid "Germanic"
+msgstr ""
+
+msgid "Go to passage"
+msgstr ""
+
+msgid "Green"
+msgstr ""
+
+msgid "Highlight color"
+msgstr ""
+
+msgid "Highlight selected text"
+msgstr ""
+
+msgid "I agree to connect this site to Bible Desktop under the API terms and privacy policy."
+msgstr ""
+
+msgid "Import"
+msgstr ""
+
+msgid "Import Bible module"
+msgstr ""
+
+msgid "Import file is missing."
+msgstr ""
+
+msgid "Import module"
+msgstr ""
+
+msgid "Imported modules are preserved. Use [bible_desktop source=\"local\"] for the original local reader. Its import tools remain available under Bible Desktop."
+msgstr ""
+
+msgid "Invalid reader request."
+msgstr ""
+
+msgid "Kru"
+msgstr ""
+
+msgid "Language"
+msgstr ""
+
+msgid "Language group"
+msgstr ""
+
+msgid "Last check result"
+msgstr ""
+
+msgid "Last verse"
+msgstr ""
+
+msgid "Learned"
+msgstr ""
+
+msgid "Line spacing"
+msgstr ""
+
+msgid "Link to selected verse"
+msgstr ""
+
+msgid "Loading…"
+msgstr ""
+
+msgid "Mande"
+msgstr ""
+
+msgid "Mayan"
+msgstr ""
+
+msgid "Memory cards"
+msgstr ""
+
+msgid "Module file"
+msgstr ""
+
+msgid "Modules"
+msgstr ""
+
+msgid "Monomakh Unicode"
+msgstr ""
+
+msgid "More"
+msgstr ""
+
+msgid "More results"
+msgstr ""
+
+msgid "My bookmarks"
+msgstr ""
+
+msgid "My notes"
+msgstr ""
+
+msgid "My passages"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "New Testament"
+msgstr ""
+
+msgid "Next chapter"
+msgstr ""
+
+msgid "Night mode"
+msgstr ""
+
+msgid "Nilotic"
+msgstr ""
+
+msgid "No"
+msgstr ""
+
+msgid "No chapter text was returned."
+msgstr ""
+
+msgid "No file uploaded."
+msgstr ""
+
+msgid "No imported modules yet."
+msgstr ""
+
+msgid "No results."
+msgstr ""
+
+msgid "No stored correspondence for this verse. No numbering shift was guessed."
+msgstr ""
+
+msgid "None"
+msgstr ""
+
+msgid "One finger: chapters"
+msgstr ""
+
+msgid "Only preserved source elements are shown. Missing headings, footnotes and formatting are not reconstructed."
+msgstr ""
+
+msgid "Open"
+msgstr ""
+
+msgid "Other / unspecified group"
+msgstr ""
+
+msgid "Other Indo-European"
+msgstr ""
+
+msgid "Other editions"
+msgstr ""
+
+msgid "Oto-Manguean"
+msgstr ""
+
+msgid "PHP ZipArchive extension is required."
+msgstr ""
+
+msgid "Passage and personal study"
+msgstr ""
+
+msgid "Paused"
+msgstr ""
+
+msgid "Pink"
+msgstr ""
+
+msgid "Please try again in a minute."
+msgstr ""
+
+msgid "Preview passage"
+msgstr ""
+
+msgid "Previous chapter"
+msgstr ""
+
+msgid "Read full chapter"
+msgstr ""
+
+msgid "Reader interface language"
+msgstr ""
+
+msgid "Reading history"
+msgstr ""
+
+msgid "Refresh cached Bibles"
+msgstr ""
+
+msgid "Refresh cached content on next use"
+msgstr ""
+
+msgid "Refresh catalog"
+msgstr ""
+
+msgid "Remember reading history in this browser"
+msgstr ""
+
+msgid "Remove favorite"
+msgstr ""
+
+msgid "Remove highlights from this verse"
+msgstr ""
+
+msgid "Resume download"
+msgstr ""
+
+msgid "Retry"
+msgstr ""
+
+msgid "Romance and Latin"
+msgstr ""
+
+msgid "Running"
+msgstr ""
+
+msgid "Sans serif"
+msgstr ""
+
+msgid "Save"
+msgstr ""
+
+msgid "Save and connect"
+msgstr ""
+
+msgid "Save for memorization"
+msgstr ""
+
+msgid "Save passage"
+msgstr ""
+
+msgid "Saved in this browser."
+msgstr ""
+
+msgid "Search"
+msgstr ""
+
+msgid "Search Bible"
+msgstr ""
+
+msgid "Select a verse to study it."
+msgstr ""
+
+msgid "Serif"
+msgstr ""
+
+msgid "Settings saved."
+msgstr ""
+
+msgid "Share"
+msgstr ""
+
+msgid "Show / hide text"
+msgstr ""
+
+msgid "Show an optional Bible Desktop credit link below the reader."
+msgstr ""
+
+msgid "Sino-Tibetan"
+msgstr ""
+
+msgid "Slavic"
+msgstr ""
+
+msgid "Source footnotes"
+msgstr ""
+
+msgid "Source headings"
+msgstr ""
+
+msgid "Source numbering is not verified. The reference is shown without an automatic text match."
+msgstr ""
+
+msgid "Source paragraphs"
+msgstr ""
+
+msgid "Stop download"
+msgstr ""
+
+msgid "Stopped"
+msgstr ""
+
+msgid "Strong"
+msgstr ""
+
+msgid "Strong numbers"
+msgstr ""
+
+msgid "Study module"
+msgstr ""
+
+msgid "Study tools and bookmarks"
+msgstr ""
+
+msgid "Style added words"
+msgstr ""
+
+msgid "Tap edges: previous / next screen"
+msgstr ""
+
+msgid "Text font"
+msgstr ""
+
+msgid "Text size"
+msgstr ""
+
+msgid "The Bible reader is not configured yet."
+msgstr ""
+
+msgid "The Bible reader is not connected yet."
+msgstr ""
+
+msgid "The search text is too long."
+msgstr ""
+
+msgid "This material is no longer available from the source."
+msgstr ""
+
+msgid "This passage does not exist in the selected text."
+msgstr ""
+
+msgid "Title"
+msgstr ""
+
+msgid "To chapter:verse"
+msgstr ""
+
+msgid "Trans-New Guinea"
+msgstr ""
+
+msgid "Translation"
+msgstr ""
+
+msgid "Two fingers: books"
+msgstr ""
+
+msgid "Underline"
+msgstr ""
+
+msgid "Upload a BibleQuote ZIP or a SQLite3 module. The plugin imports into its own WordPress tables."
+msgstr ""
+
+msgid "Use the %s shortcode on any WordPress page."
+msgstr ""
+
+msgid "Use the Bible Reader or Bible Passage blocks in the block editor. Passage books use the API book slug of the selected translation. Links open the reader on the current page."
+msgstr ""
+
+msgid "Verse"
+msgstr ""
+
+msgid "Verse numbers"
+msgstr ""
+
+msgid "Verses"
+msgstr ""
+
+msgid "Verses on separate lines"
+msgstr ""
+
+msgid "Which Bible translations would you like to connect?"
+msgstr ""
+
+msgid "WordPress language"
+msgstr ""
+
+msgid "Yellow"
+msgstr ""
+
+msgid "Yes"
+msgstr ""
+
+msgid "You cannot change these settings."
+msgstr ""

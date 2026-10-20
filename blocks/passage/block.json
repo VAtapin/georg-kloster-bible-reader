@@ -1,0 +1,16 @@
+{
+  "apiVersion": 3,
+  "name": "georg-kloster-bible-reader/passage",
+  "title": "Bible Passage",
+  "category": "widgets",
+  "icon": "book-alt",
+  "description": "Embed a Bible passage from a connected translation.",
+  "textdomain": "georg-kloster-bible-reader",
+  "attributes": {
+    "translation": { "type": "string", "default": "" },
+    "book": { "type": "string", "default": "john" },
+    "chapter": { "type": "string", "default": "3" },
+    "from": { "type": "string", "default": "16" },
+    "to": { "type": "string", "default": "21" }
+  }
+}

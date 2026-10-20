@@ -1,0 +1,602 @@
+msgid ""
+msgstr "Project-Id-Version: Georg Kloster Bible Reader 1.1.10\nContent-Type: text/plain; charset=UTF-8\nLanguage: ru_RU\nPlural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+msgid "API privacy policy"
+msgstr "Конфиденциальность API"
+
+msgid "API terms"
+msgstr "Условия API"
+
+msgid "Add a note"
+msgstr "Добавить заметку"
+
+msgid "Add favorite"
+msgstr "В избранное"
+
+msgid "Add the reader to your site"
+msgstr "Добавить чтение Библии на сайт"
+
+msgid "Afro-Asiatic"
+msgstr "Афразийские"
+
+msgid "All"
+msgstr "Все"
+
+msgid "All groups"
+msgstr "Все группы"
+
+msgid "All languages"
+msgstr "Все языки"
+
+msgid "Already cached chapters remain available when Bible Desktop is unavailable."
+msgstr "Сохранённые главы доступны при сбое Bible Desktop."
+
+msgid "Arawakan"
+msgstr "Аравакские"
+
+msgid "Atlantic-Congo"
+msgstr "Атлантическо-конголезские"
+
+msgid "Audio"
+msgstr "Аудио"
+
+msgid "Audio is not available for this text."
+msgstr "Аудио для этого текста недоступно."
+
+msgid "Austroasiatic"
+msgstr "Австроазиатские"
+
+msgid "Austronesian"
+msgstr "Австронезийские"
+
+msgid "Back"
+msgstr "Назад"
+
+msgid "Background download queued. Existing cached text remains available."
+msgstr "Фоновая загрузка запланирована. Сохранённый текст остаётся доступным."
+
+msgid "Bad nonce"
+msgstr "Срок действия запроса истёк. Обновите страницу."
+
+msgid "Bible"
+msgstr "Библия"
+
+msgid "Bible Desktop is temporarily unavailable. Please try again later."
+msgstr "Bible Desktop временно недоступен. Попробуйте позже."
+
+msgid "Bible Desktop modules"
+msgstr "Модули Bible Desktop"
+
+msgid "Bible Desktop supplies public Bible texts, commentary, dictionaries, and maps. Requests are sent by this WordPress server and include its IP address, requested references, and search words. Visitor IP addresses, accounts, bookmarks, and reading history are not sent to Bible Desktop."
+msgstr "Bible Desktop предоставляет опубликованные тексты Библии, толкования, словари и карты. Запросы отправляет сервер WordPress: передаются его IP-адрес, ссылки на материалы и поисковые слова. IP-адреса посетителей, учётные записи, закладки и история чтения в Bible Desktop не передаются."
+
+msgid "Bible Passage"
+msgstr "Библейский отрывок"
+
+msgid "Bible Reader"
+msgstr "Библия"
+
+msgid "Bible library"
+msgstr "Библиотека Библии"
+
+msgid "Blue"
+msgstr "Синий"
+
+msgid "Book"
+msgstr "Книга"
+
+msgid "Bookmark verse"
+msgstr "Закладка на стих"
+
+msgid "Bookmarks and history stay in this browser."
+msgstr "Закладки и история остаются в этом браузере."
+
+msgid "Books"
+msgstr "Книги"
+
+msgid "Browser storage is unavailable."
+msgstr "Хранилище браузера недоступно."
+
+msgid "Chapter"
+msgstr "Глава"
+
+msgid "Chapter labels"
+msgstr "Обозначения глав"
+
+msgid "Chapter:verse"
+msgstr "Глава:стих"
+
+msgid "Chapters are cached for one year; study texts for 90 days. Catalogs are checked daily. Cached content is retained during outages. Changed content revisions refresh chapters on demand. Manual refresh replaces each response only after a successful download. WordPress scheduled tasks need site visits or a configured cron runner."
+msgstr "Главы кэшируются на год, справочные тексты — на 90 дней. Каталоги проверяются ежедневно. При сбоях сохранённые данные остаются доступными. Изменение версии обновляет главы по мере чтения. Ручное обновление заменяет данные только после успешной загрузки. Фоновые задачи WordPress требуют посещений сайта или настроенного cron."
+
+msgid "Check module"
+msgstr "Проверить модуль"
+
+msgid "Choose a translation and passage in the block settings."
+msgstr "Выберите перевод и отрывок в настройках блока."
+
+msgid "Choose a translation enabled by the administrator."
+msgstr "Выберите перевод, подключённый администратором."
+
+msgid "Choose book, chapter and verse"
+msgstr "Выбрать книгу, главу и стих"
+
+msgid "Clean text"
+msgstr "Чистый текст"
+
+msgid "Clear local bookmarks and history"
+msgstr "Очистить местные закладки и историю"
+
+msgid "Close"
+msgstr "Закрыть"
+
+msgid "Collection"
+msgstr "Подборка"
+
+msgid "Commentary"
+msgstr "Толкование"
+
+msgid "Compare translation"
+msgstr "Сравнить с переводом"
+
+msgid "Comparison follows stored verse IDs. Unverified source numbering may differ, especially in Psalms."
+msgstr "Сравнение использует сохранённые идентификаторы стихов. Непроверенная нумерация источников может различаться, особенно в Псалтири."
+
+msgid "Complete"
+msgstr "Завершено"
+
+msgid "Connect Bible Desktop in the reader settings first."
+msgstr "Сначала подключите Bible Desktop в настройках плагина."
+
+msgid "Continuous reading"
+msgstr "Непрерывное чтение"
+
+msgid "Copy link"
+msgstr "Копировать ссылку"
+
+msgid "Could not load this material. Please try again later."
+msgstr "Не удалось загрузить материал. Попробуйте позже."
+
+msgid "Cross references"
+msgstr "Параллельные места"
+
+msgid "Default translation"
+msgstr "Основной перевод"
+
+msgid "Delete"
+msgstr "Удалить"
+
+msgid "Dictionaries and maps"
+msgstr "Словари и карты"
+
+msgid "Dictionary entry is not imported yet."
+msgstr "Словарная статья ещё не импортирована."
+
+msgid "Display and controls"
+msgstr "Отображение и управление"
+
+msgid "Download selected Bibles"
+msgstr "Загрузить выбранные Библии"
+
+msgid "Download: %1$d of %2$d chapters. Status: %3$s."
+msgstr "Загружено %1$d из %2$d глав. Состояние: %3$s."
+
+msgid "Dravidian"
+msgstr "Дравидийские"
+
+msgid "Enable other dictionaries"
+msgstr "Включить другие словари"
+
+msgid "Existing local modules"
+msgstr "Ранее импортированные модули"
+
+msgid "Exit full screen"
+msgstr "Выйти из полноэкранного режима"
+
+msgid "Export personal study"
+msgstr "Экспорт личного изучения"
+
+msgid "Favorite translations"
+msgstr "Избранные переводы"
+
+msgid "File"
+msgstr "Файл"
+
+msgid "Filter translations"
+msgstr "Найти перевод"
+
+msgid "First selected translation"
+msgstr "Первый выбранный перевод"
+
+msgid "First verse"
+msgstr "Первый стих"
+
+msgid "Forbidden"
+msgstr "Доступ запрещён"
+
+msgid "Format"
+msgstr "Формат"
+
+msgid "Forward"
+msgstr "Вперёд"
+
+msgid "From chapter:verse"
+msgstr "От главы:стиха"
+
+msgid "Full screen"
+msgstr "На весь экран"
+
+msgid "Georg Kloster Bible Reader"
+msgstr "Georg Kloster — Библия"
+
+msgid "Germanic"
+msgstr "Германские"
+
+msgid "Go to passage"
+msgstr "Перейти к отрывку"
+
+msgid "Green"
+msgstr "Зелёный"
+
+msgid "Highlight color"
+msgstr "Цвет выделения"
+
+msgid "Highlight selected text"
+msgstr "Выделить выбранный текст"
+
+msgid "I agree to connect this site to Bible Desktop under the API terms and privacy policy."
+msgstr "Согласен подключить сайт к Bible Desktop на условиях API и политики конфиденциальности."
+
+msgid "Import"
+msgstr "Импорт"
+
+msgid "Import Bible module"
+msgstr "Импорт библейского модуля"
+
+msgid "Import file is missing."
+msgstr "Файл импорта отсутствует."
+
+msgid "Import module"
+msgstr "Импортировать модуль"
+
+msgid "Imported modules are preserved. Use [bible_desktop source=\"local\"] for the original local reader. Its import tools remain available under Bible Desktop."
+msgstr "Импортированные модули сохранены. Шорткод [bible_desktop source=\"local\"] открывает прежнее локальное чтение. Импорт остаётся доступен в меню Bible Desktop."
+
+msgid "Invalid reader request."
+msgstr "Некорректный запрос чтения."
+
+msgid "Kru"
+msgstr "Кру"
+
+msgid "Language"
+msgstr "Язык"
+
+msgid "Language group"
+msgstr "Языковая группа"
+
+msgid "Last check result"
+msgstr "Результат последней проверки"
+
+msgid "Last verse"
+msgstr "Последний стих"
+
+msgid "Learned"
+msgstr "Выучено"
+
+msgid "Line spacing"
+msgstr "Межстрочный интервал"
+
+msgid "Link to selected verse"
+msgstr "Ссылка на выбранный стих"
+
+msgid "Loading…"
+msgstr "Загрузка…"
+
+msgid "Mande"
+msgstr "Манде"
+
+msgid "Mayan"
+msgstr "Майя"
+
+msgid "Memory cards"
+msgstr "Карточки для заучивания"
+
+msgid "Module file"
+msgstr "Файл модуля"
+
+msgid "Modules"
+msgstr "Модули"
+
+msgid "Monomakh Unicode"
+msgstr "Monomakh Unicode"
+
+msgid "More"
+msgstr "Ещё"
+
+msgid "More results"
+msgstr "Ещё результаты"
+
+msgid "My bookmarks"
+msgstr "Мои закладки"
+
+msgid "My notes"
+msgstr "Мои заметки"
+
+msgid "My passages"
+msgstr "Мои отрывки"
+
+msgid "Name"
+msgstr "Название"
+
+msgid "New Testament"
+msgstr "Новый Завет"
+
+msgid "Next chapter"
+msgstr "Следующая глава"
+
+msgid "Night mode"
+msgstr "Ночной режим"
+
+msgid "Nilotic"
+msgstr "Нилотские"
+
+msgid "No"
+msgstr "Нет"
+
+msgid "No chapter text was returned."
+msgstr "Текст главы не получен."
+
+msgid "No file uploaded."
+msgstr "Файл не загружен."
+
+msgid "No imported modules yet."
+msgstr "Пока нет импортированных модулей."
+
+msgid "No results."
+msgstr "Ничего не найдено."
+
+msgid "No stored correspondence for this verse. No numbering shift was guessed."
+msgstr "Для этого стиха нет сохранённого соответствия. Сдвиг нумерации не подбирался."
+
+msgid "None"
+msgstr "Нет"
+
+msgid "One finger: chapters"
+msgstr "Один палец: главы"
+
+msgid "Only preserved source elements are shown. Missing headings, footnotes and formatting are not reconstructed."
+msgstr "Показываются только сохранённые элементы источника. Отсутствующие подзаголовки, сноски и оформление не восстанавливаются."
+
+msgid "Open"
+msgstr "Открыть"
+
+msgid "Other / unspecified group"
+msgstr "Другие / группа не указана"
+
+msgid "Other Indo-European"
+msgstr "Другие индоевропейские"
+
+msgid "Other editions"
+msgstr "Другие издания"
+
+msgid "Oto-Manguean"
+msgstr "Ото-мангские"
+
+msgid "PHP ZipArchive extension is required."
+msgstr "Требуется расширение PHP ZipArchive."
+
+msgid "Passage and personal study"
+msgstr "Отрывок и личное изучение"
+
+msgid "Paused"
+msgstr "Приостановлено"
+
+msgid "Pink"
+msgstr "Розовый"
+
+msgid "Please try again in a minute."
+msgstr "Повторите через минуту."
+
+msgid "Preview passage"
+msgstr "Показать отрывок"
+
+msgid "Previous chapter"
+msgstr "Предыдущая глава"
+
+msgid "Read full chapter"
+msgstr "Читать главу целиком"
+
+msgid "Reader interface language"
+msgstr "Язык интерфейса чтения"
+
+msgid "Reading history"
+msgstr "История чтения"
+
+msgid "Refresh cached Bibles"
+msgstr "Обновить сохранённые Библии"
+
+msgid "Refresh cached content on next use"
+msgstr "Обновить кэш при следующем чтении"
+
+msgid "Refresh catalog"
+msgstr "Обновить каталог"
+
+msgid "Remember reading history in this browser"
+msgstr "Сохранять историю чтения в этом браузере"
+
+msgid "Remove favorite"
+msgstr "Убрать из избранного"
+
+msgid "Remove highlights from this verse"
+msgstr "Удалить выделения стиха"
+
+msgid "Resume download"
+msgstr "Продолжить загрузку"
+
+msgid "Retry"
+msgstr "Повторить"
+
+msgid "Romance and Latin"
+msgstr "Романские и латинский"
+
+msgid "Running"
+msgstr "Выполняется"
+
+msgid "Sans serif"
+msgstr "Без засечек"
+
+msgid "Save"
+msgstr "Сохранить"
+
+msgid "Save and connect"
+msgstr "Сохранить и подключить"
+
+msgid "Save for memorization"
+msgstr "Добавить для заучивания"
+
+msgid "Save passage"
+msgstr "Сохранить отрывок"
+
+msgid "Saved in this browser."
+msgstr "Сохранено в этом браузере."
+
+msgid "Search"
+msgstr "Поиск"
+
+msgid "Search Bible"
+msgstr "Поиск по Библии"
+
+msgid "Select a verse to study it."
+msgstr "Выберите стих для изучения."
+
+msgid "Serif"
+msgstr "С засечками"
+
+msgid "Settings saved."
+msgstr "Настройки сохранены."
+
+msgid "Share"
+msgstr "Поделиться"
+
+msgid "Show / hide text"
+msgstr "Показать / скрыть текст"
+
+msgid "Show an optional Bible Desktop credit link below the reader."
+msgstr "Показывать ссылку на Bible Desktop под текстом."
+
+msgid "Sino-Tibetan"
+msgstr "Сино-тибетские"
+
+msgid "Slavic"
+msgstr "Славянские"
+
+msgid "Source footnotes"
+msgstr "Сноски источника"
+
+msgid "Source headings"
+msgstr "Подзаголовки источника"
+
+msgid "Source numbering is not verified. The reference is shown without an automatic text match."
+msgstr "Нумерация источника не проверена. Ссылка показана без автоматического сопоставления текста."
+
+msgid "Source paragraphs"
+msgstr "Абзацы источника"
+
+msgid "Stop download"
+msgstr "Остановить загрузку"
+
+msgid "Stopped"
+msgstr "Остановлено"
+
+msgid "Strong"
+msgstr "Стронг"
+
+msgid "Strong numbers"
+msgstr "Номера Стронга"
+
+msgid "Study module"
+msgstr "Модуль изучения"
+
+msgid "Study tools and bookmarks"
+msgstr "Изучение и закладки"
+
+msgid "Style added words"
+msgstr "Оформление добавленных слов"
+
+msgid "Tap edges: previous / next screen"
+msgstr "Касание краёв: экран назад / вперёд"
+
+msgid "Text font"
+msgstr "Шрифт текста"
+
+msgid "Text size"
+msgstr "Размер текста"
+
+msgid "The Bible reader is not configured yet."
+msgstr "Чтение Библии ещё не настроено."
+
+msgid "The Bible reader is not connected yet."
+msgstr "Подключение Библии ещё не настроено."
+
+msgid "The search text is too long."
+msgstr "Слишком длинный поисковый запрос."
+
+msgid "This material is no longer available from the source."
+msgstr "Этот материал больше недоступен у источника."
+
+msgid "This passage does not exist in the selected text."
+msgstr "Такого места нет в выбранном тексте."
+
+msgid "Title"
+msgstr "Название"
+
+msgid "To chapter:verse"
+msgstr "До главы:стиха"
+
+msgid "Trans-New Guinea"
+msgstr "Трансновогвинейские"
+
+msgid "Translation"
+msgstr "Перевод"
+
+msgid "Two fingers: books"
+msgstr "Два пальца: книги"
+
+msgid "Underline"
+msgstr "Подчеркнуть"
+
+msgid "Upload a BibleQuote ZIP or a SQLite3 module. The plugin imports into its own WordPress tables."
+msgstr "Загрузите BibleQuote ZIP или модуль SQLite3. Импорт выполняется в отдельные таблицы WordPress."
+
+msgid "Use the %s shortcode on any WordPress page."
+msgstr "Используйте шорткод %s на любой странице WordPress."
+
+msgid "Use the Bible Reader or Bible Passage blocks in the block editor. Passage books use the API book slug of the selected translation. Links open the reader on the current page."
+msgstr "Используйте блоки «Библия» и «Библейский отрывок» в редакторе. Для книги указывается её slug из API выбранного перевода. Ссылки открывают чтение на текущей странице."
+
+msgid "Verse"
+msgstr "Стих"
+
+msgid "Verse numbers"
+msgstr "Номера стихов"
+
+msgid "Verses"
+msgstr "Стихи"
+
+msgid "Verses on separate lines"
+msgstr "Стихи с новой строки"
+
+msgid "Which Bible translations would you like to connect?"
+msgstr "Какие переводы Библии подключить?"
+
+msgid "WordPress language"
+msgstr "Язык WordPress"
+
+msgid "Yellow"
+msgstr "Жёлтый"
+
+msgid "Yes"
+msgstr "Да"
+
+msgid "You cannot change these settings."
+msgstr "Недостаточно прав для изменения настроек."

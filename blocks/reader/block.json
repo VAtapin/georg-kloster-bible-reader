@@ -1,0 +1,14 @@
+{
+  "apiVersion": 3,
+  "name": "georg-kloster-bible-reader/reader",
+  "title": "Bible Reader",
+  "category": "widgets",
+  "icon": "book-alt",
+  "description": "Read and study the enabled Bible translations.",
+  "textdomain": "georg-kloster-bible-reader",
+  "attributes": {
+    "translation": { "type": "string", "default": "" },
+    "book": { "type": "string", "default": "" },
+    "chapter": { "type": "string", "default": "1" }
+  }
+}

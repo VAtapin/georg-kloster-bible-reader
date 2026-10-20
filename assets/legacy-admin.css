@@ -1,0 +1,24 @@
+.gkbr-legacy-admin-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+	gap: 16px;
+	margin-top: 18px;
+}
+
+.gkbr-legacy-admin-card {
+	border: 1px solid #dcdcde;
+	background: #fff;
+	padding: 14px;
+}
+
+.gkbr-legacy-admin-card img,
+.gkbr-legacy-admin-cover {
+	width: 100%;
+	aspect-ratio: 3 / 4;
+	object-fit: cover;
+	background: #123f68;
+	color: #fff;
+	display: grid;
+	place-items: center;
+	font-weight: 700;
+}
