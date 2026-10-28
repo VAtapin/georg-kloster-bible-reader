@@ -1,8 +1,8 @@
 # Project status
 
-- State: Georg Kloster Bible Reader 1.1.10 is published. Six Russian-language UI screenshots and their readme captions are prepared in `.wordpress-org/` and `readme.txt`; the asset-sync workflow publishes them from `main`.
-- Decision: keep plugin-directory screenshots and artwork in `.wordpress-org/`, excluded from plugin ZIPs; publish directory assets through the dedicated GitHub Actions workflow.
-- Checks: `git diff --check` passed. Each screenshot matches its user-provided PNG byte-for-byte; dimensions range from 853×864 to 922×916. No software tests were needed for this documentation and image update.
-- Known issue: GlotPress accepted 200 RU and 200 DE interface translations, plus 12 localized readme strings for each of DE/PL/RU/UK; all are waiting for locale-team approval. WordPress.org may take time to show refreshed directory assets.
-- Next: verify the asset-sync workflow and published SVN screenshots, then check the translation approvals and localized listings.
-- Last related commit before this update: 12a712f (Record WordPress.org asset publication).
+- State: Georg Kloster Bible Reader 1.1.10 remains published. Dictionary workspace changes are prepared locally as a review build; no version bump or publication was made.
+- Implemented: dictionary browsing and entries use the main reading area and independent state, so Bible navigation and verse selection do not control them. Verse-specific commentary remains in the right pane, which can be resized and remembers its width. Dictionary Bible references open the matching passage in a popup; structured references not matched inline remain clickable below the article. Changed reader assets use file modification times for cache refresh without changing the plugin version.
+- Checks: JavaScript syntax checks, PHP lint, `git diff --check`, and a reference matcher smoke check passed. No live WordPress integration check was run; the plugin was not uploaded or published.
+- Known issue: inline citation links require an exact match with structured references supplied by the API; remaining structured references are shown as clickable fallback links.
+- Next: review `georg-kloster-bible-reader-1.1.10-review.zip` and send feedback before any publication.
+- Last related commit: d72650c (Publish plugin directory screenshots).

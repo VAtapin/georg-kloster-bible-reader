@@ -56,15 +56,10 @@
         try { config = JSON.parse(root.dataset.config); } catch { return; }
         const t = config.ui;
         let current = { ...config.initial }, selected = null, catalog = [], books = [], chapterData = null;
-        let navigation = 0, sideRequest = 0, compareRequest = 0, studyModules = null, dictionaries = null;
+        let navigation = 0, sideRequest = 0, compareRequest = 0, dictionaryRequest = 0, studyModules = null, dictionaries = null;
         let history = [], bookmarks = [], remember = false, lastPlace = null;
         let shell = null, continuous = null;
-        const dictionaryStorageKey = 'gkbr:enabled-dictionaries:v1';
-        let enabledDictionaries = new Set();
-        try {
-            const saved = JSON.parse(localStorage.getItem(dictionaryStorageKey) || '[]');
-            if (Array.isArray(saved)) enabledDictionaries = new Set(saved.filter(code => typeof code === 'string' && /^[A-Za-z0-9_-]{1,100}$/.test(code)));
-        } catch { /* Optional dictionary choices stay in this browser. */ }
+        const dictionaryState = { module: '', query: '', entry: null, mode: 'browser', open: false };
         lifecycle.signal.addEventListener('abort', () => continuous?.dispose());
         const storageKey = 'gkbr:' + location.pathname;
         try {
@@ -87,10 +82,14 @@
         const title = element('h3');
         const status = element('p', '', { class: 'gkbr-status', role: 'status', 'aria-live': 'polite' });
         const layout = element('div', '', { class: 'gkbr-layout' });
+        const main = element('div', '', { class: 'gkbr-main' });
         const text = element('div', '', { class: 'gkbr-text' });
+        const dictionaryPane = element('section', '', { class: 'gkbr-dictionary', 'aria-label': t.dictionaries, hidden: true });
+        const resizeHandle = element('div', '', { class: 'gkbr-side-resize', role: 'separator', tabindex: 0, 'aria-orientation': 'vertical', 'aria-label': t.study });
         const side = element('aside', '', { class: 'gkbr-side', 'aria-label': t.study });
         side.hidden = true;
-        layout.append(text, side);
+        main.append(text, dictionaryPane);
+        layout.append(main, resizeHandle, side);
         root.append(toolbar, actions, title, status, layout);
         function control(label, node) {
             node.setAttribute('aria-label', label);
@@ -118,7 +117,7 @@
         size.addEventListener('input', () => root.style.setProperty('--gkbr-size', size.value + 'px'));
         button(t.commentaries, () => study('commentaries'));
         button(t.references, () => study('references'));
-        button(t.dictionaries, () => dictionaryBrowser());
+        button(t.dictionaries, () => openDictionaryView());
         function saveBookmark() {
             if (!selected) { status.textContent = t.study; return; }
             const item = { ...current, verse: selected.number, label: title.textContent + ':' + selected.number };
@@ -169,7 +168,7 @@
                 getPlace: () => ({ ...current }), getChapter: () => chapterData ? { ...chapterData, book: { ...books.find(book => book.slug === current.book), ...chapterData.book } } : null, getBooks: () => books,
                 loadBooks: translation => request(config, 'books', { translation }), navigate, selectVerse,
                 loadChapter: position => request(config, 'chapter', { translation: position.translation, book: position.book, chapter: position.chapter }), rerender: () => { renderVerses(); selectVerse(current.verse, false); compare(); },
-                bookmark: saveBookmark, commentary: () => study('commentaries'),
+                bookmark: saveBookmark, commentary: () => study('commentaries'), openDictionaries: openDictionaryView,
                 message: value => { status.textContent = value; }, signal: lifecycle.signal });
             shell.setCatalogContext({ catalog: () => catalog, families: config.families, labels: config.groupLabels });
         }
@@ -195,10 +194,36 @@
             history = [item, ...history.filter(row => placeKey(row) !== placeKey(item))].slice(0, 50); persist();
         }
         function openSide(label) {
-            side.hidden = false; side.replaceChildren();
+            side.hidden = false; resizeHandle.hidden = false; side.replaceChildren();
             const header = element('div', '', { class: 'gkbr-actions' });
-            header.append(element('strong', label)); button(t.close, () => { ++sideRequest; side.hidden = true; }, header); side.append(header);
+            header.append(element('strong', label)); button(t.close, () => { ++sideRequest; side.hidden = true; resizeHandle.hidden = true; }, header); side.append(header);
         }
+        resizeHandle.hidden = true;
+        resizeHandle.setAttribute('aria-valuemin', '22'); resizeHandle.setAttribute('aria-valuemax', '55'); resizeHandle.setAttribute('aria-valuenow', '32');
+        try {
+            const width = Number(localStorage.getItem('gkbr:study-pane-width:v1'));
+            if (Number.isFinite(width) && width >= 22 && width <= 55) { layout.style.setProperty('--gkbr-side-width', width + '%'); resizeHandle.setAttribute('aria-valuenow', String(width)); }
+        } catch { /* Pane size is an optional local preference. */ }
+        function setSideWidth(clientX) {
+            const bounds = layout.getBoundingClientRect();
+            if (bounds.width < 760) return;
+            const width = Math.max(22, Math.min(55, (bounds.right - clientX) / bounds.width * 100));
+            layout.style.setProperty('--gkbr-side-width', width + '%');
+            resizeHandle.setAttribute('aria-valuenow', String(Math.round(width)));
+            try { localStorage.setItem('gkbr:study-pane-width:v1', String(Math.round(width))); } catch { /* The current session still works. */ }
+        }
+        resizeHandle.addEventListener('pointerdown', event => {
+            if (side.hidden || event.pointerType === 'touch') return;
+            event.preventDefault(); resizeHandle.setPointerCapture(event.pointerId); setSideWidth(event.clientX);
+        }, { signal: lifecycle.signal });
+        resizeHandle.addEventListener('pointermove', event => {
+            if (event.buttons && !side.hidden) setSideWidth(event.clientX);
+        }, { signal: lifecycle.signal });
+        resizeHandle.addEventListener('keydown', event => {
+            if (side.hidden || !['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+            event.preventDefault(); const bounds = layout.getBoundingClientRect();
+            setSideWidth(event.key === 'ArrowLeft' ? bounds.right - bounds.width * .03 : bounds.right + bounds.width * .03);
+        }, { signal: lifecycle.signal });
         function error(target, message, retry) {
             target.replaceChildren(element('p', message));
             if (retry) button(t.retry, retry, target);
@@ -206,7 +231,7 @@
         async function navigate(position, initial = false, preload = null) {
             continuous?.dispose(); continuous = null;
             const version = ++navigation; ++sideRequest; ++compareRequest;
-            status.textContent = t.loading; selected = null; side.hidden = true;
+            status.textContent = t.loading; selected = null; side.hidden = true; resizeHandle.hidden = true;
             // Locations coming from personal records must never carry note text into HTTP URLs.
             current = Object.fromEntries(['translation', 'book', 'chapter', 'verse'].map(key => [key, ['string', 'number'].includes(typeof position[key]) ? position[key] : current[key]]));
             if (!catalog.some(row => row.code === current.translation)) { status.textContent = t.empty; error(text, t.empty); return; }
@@ -449,70 +474,170 @@
                 openSide(number); side.append(element('p', [result.data.word, result.data.transliteration, plain(result.data.content)].filter(Boolean).join('\n')));
             } catch (failure) { if (version === sideRequest) error(side, failure.message, () => strongEntry(number)); }
         }
+        function showDictionaryPane() {
+            dictionaryState.open = true;
+            text.hidden = true;
+            dictionaryPane.hidden = false;
+            resizeHandle.hidden = side.hidden;
+        }
+        function returnToBible() {
+            ++dictionaryRequest;
+            dictionaryState.open = false;
+            dictionaryPane.hidden = true;
+            text.hidden = false;
+        }
+        function openDictionaryView() {
+            if (dictionaryState.mode === 'entry' && dictionaryState.module && dictionaryState.entry) dictionaryEntry(dictionaryState.module, dictionaryState.entry);
+            else dictionaryBrowser();
+        }
         async function dictionaryBrowser() {
-            const version = ++sideRequest; openSide(t.dictionaries);
+            showDictionaryPane();
+            const version = ++dictionaryRequest;
+            dictionaryState.mode = 'browser';
+            dictionaryPane.replaceChildren();
+            const header = element('div', '', { class: 'gkbr-dictionary-toolbar' });
+            header.append(element('strong', t.dictionaries));
+            button(t.reader, returnToBible, header);
+            dictionaryPane.append(header, element('p', t.loading));
             try {
                 dictionaries ||= (await request(config, 'dictionaries')).data;
-                if (version !== sideRequest) return;
-                const language = String(chapterData?.translation?.language?.code || '').toLowerCase().split(/[-_]/u)[0];
-                const available = dictionaries.filter(row => row.kind !== 'word_forms');
-                const moduleLanguage = row => String(row.definition_language || row.language_code || '').toLowerCase().split(/[-_]/u)[0];
-                const visible = available.filter(row => (Boolean(language) && moduleLanguage(row) === language) || enabledDictionaries.has(row.code));
-                const other = available.filter(row => moduleLanguage(row) !== language);
-                const codes = visible.map(row => row.code);
-                if (selected && codes.length) {
-                    for (let offset = 0; offset < codes.length; offset += 30) {
-                        const linked = await request(config, 'verse-dictionaries', { verse: selected.id, modules: codes.slice(offset, offset + 30).join(',') });
-                        if (version !== sideRequest) return;
-                        linked.data.forEach(row => button(row.topic + ' · ' + row.module_name, () => dictionaryEntry(row.module_code, row.key || row.id), side));
-                    }
-                }
+                if (version !== dictionaryRequest) return;
+                const modules = dictionaries.filter(row => row.kind !== 'word_forms');
+                const controls = element('div', '', { class: 'gkbr-dictionary-controls' });
                 const select = element('select', '', { 'aria-label': t.module });
-                options(select, visible, row => row.code, row => row.name);
-                const input = element('input', '', { type: 'search', maxlength: 120, 'aria-label': t.search });
-                const results = element('div');
-                if (visible.length) { side.append(select, input); button(t.search, () => loadEntries(0), side); side.append(results); }
-                if (other.length) button(t.enableDictionaries, () => {
-                    ++sideRequest;
-                    openSide(t.enableDictionaries);
-                    for (const module of other) {
-                        const choice = element('input', '', { type: 'checkbox' }); choice.checked = enabledDictionaries.has(module.code);
-                        const label = element('label', module.name + (moduleLanguage(module) ? ' · ' + moduleLanguage(module) : ''));
-                        label.prepend(choice); side.append(label);
-                        choice.addEventListener('change', () => {
-                            if (choice.checked) enabledDictionaries.add(module.code); else enabledDictionaries.delete(module.code);
-                            try { localStorage.setItem(dictionaryStorageKey, JSON.stringify([...enabledDictionaries])); }
-                            catch { status.textContent = t.storage; }
-                        });
-                    }
-                    button(t.dictionaries, dictionaryBrowser, side);
-                }, side);
+                options(select, modules, row => row.code, row => row.name + (row.language_name ? ' · ' + row.language_name : ''));
+                if (dictionaryState.module && modules.some(row => row.code === dictionaryState.module)) select.value = dictionaryState.module;
+                else if (modules[0]) select.value = modules[0].code;
+                else dictionaryState.module = select.value;
+                dictionaryState.module = select.value;
+                const input = element('input', '', { type: 'search', maxlength: 120, 'aria-label': t.search, placeholder: t.search });
+                input.value = dictionaryState.query;
+                const searchButton = button(t.search, () => loadEntries(0), controls);
+                controls.prepend(select, input);
+                const results = element('div', '', { class: 'gkbr-dictionary-results' });
+                dictionaryPane.replaceChildren(header, controls, results);
                 async function loadEntries(offset) {
-                    const token = ++sideRequest, module = select.value;
+                    const token = ++dictionaryRequest, module = select.value;
+                    dictionaryState.module = module; dictionaryState.query = input.value.trim();
+                    results.replaceChildren(element('p', t.loading));
                     try {
-                        const result = await request(config, 'dictionary-entries', { module, q: input.value, offset }); if (token !== sideRequest) return;
-                        results.replaceChildren(); result.data.forEach(row => button(row.topic, () => dictionaryEntry(module, row.key || row.id), results));
+                        const result = await request(config, 'dictionary-entries', { module, q: dictionaryState.query, offset });
+                        if (token !== dictionaryRequest || dictionaryState.open === false) return;
+                        results.replaceChildren();
+                        result.data.forEach(row => button(row.topic, () => dictionaryEntry(module, row.key || row.id), results));
                         if (!result.data.length) results.append(element('p', t.empty));
-                        if (offset + result.data.length < result.total) button(t.more, () => loadEntries(offset + 30), results);
-                    } catch (failure) { if (token === sideRequest) error(results, failure.message, () => loadEntries(offset)); }
+                        if (offset + result.data.length < Number(result.total || 0)) button(t.more, () => loadEntries(offset + 30), results);
+                    } catch (failure) { if (token === dictionaryRequest) error(results, failure.message, () => loadEntries(offset)); }
                 }
-                select.addEventListener('change', () => loadEntries(0)); input.addEventListener('keydown', event => { if (event.key === 'Enter') loadEntries(0); });
+                select.addEventListener('change', () => { dictionaryState.module = select.value; dictionaryState.entry = null; loadEntries(0); });
+                input.addEventListener('input', () => { dictionaryState.query = input.value; });
+                input.addEventListener('keydown', event => { if (event.key === 'Enter') { event.preventDefault(); loadEntries(0); } });
+                searchButton.disabled = !modules.length;
                 if (select.value) loadEntries(0);
-            } catch (failure) { if (version === sideRequest) error(side, failure.message, dictionaryBrowser); }
+                else results.append(element('p', t.empty));
+            } catch (failure) { if (version === dictionaryRequest) error(dictionaryPane, failure.message, dictionaryBrowser); }
+        }
+        const dictionaryAliases = {
+            genesis:['Быт','Бытие','Быт.','Gen','Genesis'], exodus:['Исх','Исход','Исх.','Ex','Exod','Exodus'], leviticus:['Лев','Левит','Лев.','Lev','Leviticus'], numbers:['Чис','Числа','Чис.','Num','Numbers'], deuteronomy:['Втор','Второзаконие','Втор.','Deut','Deuteronomy'],
+            joshua:['Нав','Иисус Навин','Нав.','Josh','Joshua'], judges:['Суд','Судьи','Суд.','Judg','Judges'], ruth:['Руф','Руфь','Руф.','Ruth'], '1-samuel':['1 Цар','1Цар','1 Царств','1 Sam','1 Samuel'], '2-samuel':['2 Цар','2Цар','2 Царств','2 Sam','2 Samuel'], '1-kings':['3 Цар','3Цар','3 Царств','1 Kings'], '2-kings':['4 Цар','4Цар','4 Царств','2 Kings'],
+            '1-chronicles':['1 Пар','1Пар','1 Паралипоменон','1 Chron'], '2-chronicles':['2 Пар','2Пар','2 Паралипоменон','2 Chron'], ezra:['Езд','Ездра','Езд.','Ezra'], nehemiah:['Неем','Неемия','Неем.','Neh'], esther:['Есф','Есфирь','Есф.','Esther'], job:['Иов','Иов.','Job'], psalms:['Пс','Псалом','Псалмы','Пс.','Ps','Psalm'], proverbs:['Прит','Притчи','Прит.','Prov'], ecclesiastes:['Еккл','Екклесиаст','Еккл.','Eccl'], 'song-of-solomon':['Песн','Песнь Песней','Песн.','Song'],
+            isaiah:['Ис','Исаия','Ис.','Isa','Isaiah'], jeremiah:['Иер','Иеремия','Иер.','Jer'], lamentations:['Плач','Плач Иеремии','Плач.','Lam'], ezekiel:['Иез','Иезекииль','Иез.','Ezek'], daniel:['Дан','Даниил','Дан.','Dan'], hosea:['Ос','Осия','Ос.','Hos'], joel:['Иоил','Иоиль','Иоил.','Joel'], amos:['Ам','Амос','Ам.','Amos'], obadiah:['Авд','Авдий','Авд.','Obad'], jonah:['Ион','Иона','Ион.','Jonah'], micah:['Мих','Михей','Мих.','Mic'], nahum:['Наум','Наум.','Nah'], habakkuk:['Авв','Аввакум','Авв.','Hab'], zephaniah:['Соф','Софония','Соф.','Zeph'], haggai:['Агг','Аггей','Агг.','Hag'], zechariah:['Зах','Захария','Зах.','Zech'], malachi:['Мал','Малахия','Мал.','Mal'],
+            matthew:['Мф','Матф','Матфея','Мф.','Matt','Matthew'], mark:['Мк','Марка','Мк.','Mark'], luke:['Лк','Луки','Лк.','Luke'], john:['Ин','Иоанна','Ин.','John'], acts:['Деян','Деяния','Деян.','Acts'], romans:['Рим','Римлянам','Рим.','Rom'], '1-corinthians':['1 Кор','1Кор','1 Коринфянам','1 Cor'], '2-corinthians':['2 Кор','2Кор','2 Коринфянам','2 Cor'], galatians:['Гал','Галатам','Гал.','Gal'], ephesians:['Еф','Ефесянам','Еф.','Eph'], philippians:['Флп','Филиппийцам','Флп.','Phil'], colossians:['Кол','Колоссянам','Кол.','Col'], '1-thessalonians':['1 Фес','1Фес','1 Фессалоникийцам','1 Thess'], '2-thessalonians':['2 Фес','2Фес','2 Фессалоникийцам','2 Thess'], '1-timothy':['1 Тим','1Тим','1 Тимофею','1 Tim'], '2-timothy':['2 Тим','2Тим','2 Тимофею','2 Tim'], titus:['Тит','Титу','Тит.','Titus'], philemon:['Флм','Филимону','Флм.','Philem'], hebrews:['Евр','Евреям','Евр.','Heb'], james:['Иак','Иакова','Иак.','James'], '1-peter':['1 Пет','1Пет','1 Петра','1 Pet'], '2-peter':['2 Пет','2Пет','2 Петра','2 Pet'], '1-john':['1 Ин','1Ин','1 Иоанна','1 John'], '2-john':['2 Ин','2Ин','2 Иоанна','2 John'], '3-john':['3 Ин','3Ин','3 Иоанна','3 John'], jude:['Иуд','Иуды','Иуд.','Jude'], revelation:['Откр','Откровение','Откр.','Rev','Revelation']
+        };
+        function referenceAliasMap() {
+            const map = new Map();
+            for (const [slug, names] of Object.entries(dictionaryAliases)) for (const name of names) map.set(name.toLocaleLowerCase(), slug);
+            for (const book of books) {
+                for (const name of [book.name, book.short_name, book.abbreviation, book.slug].filter(Boolean)) map.set(String(name).toLocaleLowerCase(), book.slug);
+            }
+            return map;
+        }
+        function formatDictionaryReference(ref, bookRows = books) {
+            const book = bookRows.find(row => row.slug === ref.book_slug);
+            const from = Number(ref.verse_from), to = Number(ref.verse_to || from);
+            return (book?.name || ref.book_slug) + ' ' + ref.chapter_number + ':' + from + (to !== from ? '–' + to : '');
+        }
+        async function openDictionaryReference(ref) {
+            if (!ref || typeof ref.book_slug !== 'string' || !numeric(ref.chapter_number)) return;
+            const panel = document.createElement('dialog'); panel.className = 'gkbr-dialog'; panel.setAttribute('aria-label', t.references);
+            const header = element('header'), body = element('div', '', { class: 'gkbr-dialog-body' });
+            header.append(element('strong', t.references));
+            const close = button(t.close, () => panel.close(), header); close.textContent = '×';
+            panel.append(header, body); root.append(panel); panel.addEventListener('close', () => panel.remove(), { once: true });
+            panel.addEventListener('click', event => { if (event.target === panel) panel.close(); });
+            panel.showModal(); body.append(element('p', t.loading));
+            try {
+                const result = await request(config, 'chapter', { translation: current.translation, book: ref.book_slug, chapter: ref.chapter_number });
+                body.replaceChildren();
+                const from = Number(ref.verse_from || 1), to = Number(ref.verse_to || from);
+                body.append(element('h3', result.data.book.name + ' ' + ref.chapter_number + ':' + from + (to !== from ? '–' + to : '')));
+                const verses = result.data.verses.filter(row => Number(row.number) >= from && Number(row.number) <= to);
+                for (const verse of verses) {
+                    const line = element('p', '', { class: 'gkbr-dictionary-verse' });
+                    line.append(element('sup', verse.number), document.createTextNode(' ' + plain(verse.plain_text ?? verse.text)));
+                    body.append(line);
+                }
+                if (!verses.length) body.append(element('p', t.empty));
+            } catch (failure) { body.replaceChildren(element('p', failure.message)); }
+        }
+        function appendLinkedDictionaryBody(parent, body, references) {
+            const source = String(body || ''), aliases = referenceAliasMap();
+            const aliasPattern = [...aliases.keys()].sort((a, b) => b.length - a.length).map(value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+            const explicit = new RegExp('(?<![\\p{L}\\p{N}])(?<book>' + aliasPattern + ')\\s+(?<chapter>\\d{1,3})\\s*[:,]\\s*(?<from>\\d{1,3})(?:\\s*[-–—]\\s*(?<to>\\d{1,3}))?(?![\\p{L}\\p{N}])', 'giu');
+            const shorthand = /(?<![\p{L}\p{N}])(?<chapter>\d{1,3}):(?<from>\d{1,3})(?:\s*[-–—]\s*(?<to>\d{1,3}))?(?![\p{L}\p{N}])/gu;
+            const hits = [];
+            for (const match of source.matchAll(explicit)) hits.push({ index: match.index, end: match.index + match[0].length, text: match[0], slug: aliases.get(match.groups.book.toLocaleLowerCase()), chapter: Number(match.groups.chapter), from: Number(match.groups.from), to: Number(match.groups.to || match.groups.from), named: true });
+            for (const match of source.matchAll(shorthand)) hits.push({ index: match.index, end: match.index + match[0].length, text: match[0], chapter: Number(match.groups.chapter), from: Number(match.groups.from), to: Number(match.groups.to || match.groups.from), named: false });
+            hits.sort((a, b) => a.index - b.index || Number(b.named) - Number(a.named));
+            const used = new Set(); let lastBook = '', position = 0;
+            for (const hit of hits) {
+                if (hit.index < position) continue;
+                if (hit.named) lastBook = hit.slug;
+                else hit.slug = lastBook;
+                const refIndex = hit.slug ? references.findIndex((ref, index) => !used.has(index) && ref.book_slug === hit.slug && Number(ref.chapter_number) === hit.chapter && Number(ref.verse_from) === hit.from && Number(ref.verse_to || ref.verse_from) === hit.to) : -1;
+                parent.append(document.createTextNode(source.slice(position, hit.index)));
+                if (refIndex >= 0) {
+                    const ref = references[refIndex]; used.add(refIndex);
+                    button(hit.text, () => openDictionaryReference(ref), parent).classList.add('gkbr-inline-reference');
+                } else parent.append(document.createTextNode(hit.text));
+                position = hit.end;
+            }
+            parent.append(document.createTextNode(source.slice(position)));
+            return used;
         }
         async function dictionaryEntry(module, entry) {
-            const version = ++sideRequest;
+            const version = ++dictionaryRequest;
+            showDictionaryPane(); dictionaryState.mode = 'entry'; dictionaryState.module = module; dictionaryState.entry = entry;
+            dictionaryPane.replaceChildren(element('p', t.loading));
             try {
-                const result = await request(config, 'dictionary-entry', { module, entry }); if (version !== sideRequest) return;
-                openSide(result.data.topic); side.append(element('p', result.data.body));
-                (result.data.media || []).forEach(media => {
+                const result = await request(config, 'dictionary-entry', { module, entry }); if (version !== dictionaryRequest || !dictionaryState.open) return;
+                const data = result.data;
+                const header = element('div', '', { class: 'gkbr-dictionary-toolbar' });
+                button(t.dictionaries, dictionaryBrowser, header); header.append(element('strong', data.topic || t.dictionaries)); button(t.reader, returnToBible, header);
+                const article = element('article', '', { class: 'gkbr-dictionary-article' });
+                const body = element('div', '', { class: 'gkbr-dictionary-body' });
+                const references = Array.isArray(data.references) ? data.references.filter(ref => ref && typeof ref.book_slug === 'string' && numeric(ref.chapter_number) && numeric(ref.verse_from)) : [];
+                const linked = appendLinkedDictionaryBody(body, data.body, references);
+                article.append(body);
+                (data.media || []).forEach(media => {
                     if (!numeric(media.id)) return;
                     const url = new URL(config.ajax, location.href); url.searchParams.set('action', 'gkbr_media'); url.searchParams.set('module', module); url.searchParams.set('media', media.id);
-                    const image = element('img', '', { src: url.href, alt: result.data.topic, loading: 'lazy' }); side.append(image);
+                    article.append(element('img', '', { src: url.href, alt: data.topic || '', loading: 'lazy' }));
                 });
-                (result.data.links || []).forEach(link => button(link.label || link.topic, () => dictionaryEntry(module, link.key), side));
-                button(t.dictionaries, dictionaryBrowser, side);
-            } catch (failure) { if (version === sideRequest) error(side, failure.message, () => dictionaryEntry(module, entry)); }
+                dictionaryPane.replaceChildren(header, article);
+                const unlinked = references.filter((ref, index) => !linked.has(index));
+                if (unlinked.length) {
+                    const section = element('section', '', { class: 'gkbr-dictionary-reference-list' }); section.append(element('h3', t.references));
+                    unlinked.forEach(ref => button(formatDictionaryReference(ref), () => openDictionaryReference(ref), section));
+                    dictionaryPane.append(section);
+                }
+                const links = Array.isArray(data.links) ? data.links : [];
+                if (links.length) {
+                    const section = element('section', '', { class: 'gkbr-dictionary-crosslinks' });
+                    links.forEach(link => { if (link.key) button(link.label || link.topic, () => dictionaryEntry(module, link.key), section); });
+                    dictionaryPane.append(section);
+                }
+            } catch (failure) { if (version === dictionaryRequest) error(dictionaryPane, failure.message, () => dictionaryEntry(module, entry)); }
         }
         compareSelect.addEventListener('change', compare);
         request(config, 'catalog').then(result => {

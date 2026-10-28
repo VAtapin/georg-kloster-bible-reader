@@ -4,13 +4,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; }
 
 function gkbr_register_assets(): void {
-	wp_register_style( 'gkbr-reader', GKBR_URL . 'assets/reader.css', array(), GKBR_VERSION );
+	wp_register_style( 'gkbr-reader', GKBR_URL . 'assets/reader.css', array(), (string) filemtime( GKBR_DIR . 'assets/reader.css' ) );
 	wp_register_script( 'gkbr-personal', GKBR_URL . 'assets/personal-study.js', array(), GKBR_VERSION, true );
 	wp_register_script( 'gkbr-source', GKBR_URL . 'assets/source-text.js', array(), GKBR_VERSION, true );
 	wp_register_script( 'gkbr-references', GKBR_URL . 'assets/reference-target.js', array(), GKBR_VERSION, true );
 	wp_register_script( 'gkbr-continuous', GKBR_URL . 'assets/continuous-reader.js', array(), GKBR_VERSION, true );
-	wp_register_script( 'gkbr-shell', GKBR_URL . 'assets/reader-shell.js', array( 'gkbr-personal' ), GKBR_VERSION, true );
-	wp_register_script( 'gkbr-reader', GKBR_URL . 'assets/reader.js', array( 'gkbr-shell', 'gkbr-source', 'gkbr-references', 'gkbr-continuous' ), GKBR_VERSION, true );
+	wp_register_script( 'gkbr-shell', GKBR_URL . 'assets/reader-shell.js', array( 'gkbr-personal' ), (string) filemtime( GKBR_DIR . 'assets/reader-shell.js' ), true );
+	wp_register_script( 'gkbr-reader', GKBR_URL . 'assets/reader.js', array( 'gkbr-shell', 'gkbr-source', 'gkbr-references', 'gkbr-continuous' ), (string) filemtime( GKBR_DIR . 'assets/reader.js' ), true );
 }
 
 function gkbr_editor_assets(): void {

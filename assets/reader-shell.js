@@ -2,7 +2,7 @@
 (() => {
     'use strict';
     window.gkbrReaderShell = function (api) {
-        const { root, t, node, button, toolbar, actions, title, text, layout, tools, size, getPlace, getChapter, getBooks, loadBooks, navigate, selectVerse, loadChapter, rerender, bookmark, commentary, message } = api;
+        const { root, t, node, button, toolbar, actions, title, text, layout, tools, size, getPlace, getChapter, getBooks, loadBooks, navigate, selectVerse, loadChapter, rerender, bookmark, commentary, openDictionaries, message } = api;
         const preferencesKey = 'gkbr:reader-preferences:v1';
         const defaults = { fontSize: 19, lineHeight: 1.55, font: 'serif', night: false, verseNumbers: true, separateVerses: true, chapterLabels: true, headings: true, footnotes: true, strongNumbers: false, paragraphs: true, addedWords: true, clean: false, continuous: true, tapPaging: false, swipeChapters: false, swipeBooks: false };
         let preferences = { ...defaults }, catalogContext = null;
@@ -35,6 +35,8 @@
         icon(grid, 'M3 3h18v18H3zM9 3v18M15 3v18M3 9h18M3 15h18');
         const searchButton = button(t.search, () => openSearch(), header); searchButton.className = 'gkbr-icon';
         icon(searchButton, 'M11 3a8 8 0 1 0 0 16 8 8 0 0 0 0-16m6 14 4 4');
+        const dictionaries = button(t.dictionaries, () => openDictionaries?.(), header); dictionaries.className = 'gkbr-icon';
+        icon(dictionaries, 'M4 4h16v16H4zM8 8h8M8 12h8M8 16h5');
         const appearance = button(t.settings, () => showSettings(), header); appearance.className = 'gkbr-icon'; appearance.textContent = 'Aa';
         const fullscreen = button(t.fullscreen, toggleFullscreen, header); fullscreen.className = 'gkbr-icon';
         icon(fullscreen, 'M4 9V4h5m6 0h5v5m0 6v5h-5M9 20H4v-5');
@@ -294,7 +296,7 @@
             }), panel.body);
             button(t.references, run(() => core(t.references)?.click()), panel.body);
             button(t.history, run(() => core(t.history)?.click()), panel.body);
-            button(t.dictionaries, run(() => core(t.dictionaries)?.click()), panel.body);
+            button(t.dictionaries, run(() => openDictionaries?.()), panel.body);
             button(t.commentaries, run(commentary), panel.body);
             button(t.personal, run(() => personal.personal()), panel.body);
         }
