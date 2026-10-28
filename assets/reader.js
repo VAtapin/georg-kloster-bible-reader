@@ -650,6 +650,11 @@
                                 }, { root: dictionaryPane, rootMargin: '220px' });
                                 dictionaryObserver.observe(sentinel);
                             }
+                            if (!done && sentinel.isConnected) {
+                                const paneBounds = dictionaryPane.getBoundingClientRect();
+                                const sentinelBounds = sentinel.getBoundingClientRect();
+                                if (sentinelBounds.top <= paneBounds.bottom + 220) window.requestAnimationFrame(loadNext);
+                            }
                         } catch (failure) {
                             if (token !== dictionaryRequest) return;
                             dictionaryObserver?.disconnect(); dictionaryObserver = null;
