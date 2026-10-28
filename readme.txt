@@ -151,6 +151,15 @@ Background jobs stop on deactivation. Settings, downloaded images, cached
 responses, and imported modules are retained. This release has no automatic
 destructive uninstall routine.
 
+== Screenshots ==
+
+1. Connection settings, available Bible translations, and reader options.
+2. Bible chapter view with reading controls.
+3. Book, chapter, and verse navigation.
+4. Bible chapter with the commentary panel.
+5. Selected-verse study actions and saved passage tools.
+6. Dictionaries and maps available for the selected translation.
+
 == Changelog ==
 
 = 1.1.10 =
