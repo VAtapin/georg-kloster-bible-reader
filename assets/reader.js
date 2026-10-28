@@ -556,7 +556,7 @@
                         choice.setAttribute('aria-pressed', String(String(value) === dictionaryState.letter));
                     };
                     const code = String(module?.language_code || '').toLowerCase().split(/[-_]/u)[0];
-                    if (code === 'cu' && module?.kind === 'lexicon') {
+                    if (String(module?.code || '').toUpperCase() === 'AZBYKA_CU_FULL') {
                         try {
                             const result = await request(config, 'dictionary-alphabet', { module: select.value });
                             if (token !== dictionaryRequest || !dictionaryState.open) return;
