@@ -1,0 +1,30 @@
+name: Update WordPress.org plugin assets
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .wordpress-org/**
+      - readme.txt
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  update:
+    name: Publish directory assets
+    runs-on: ubuntu-latest
+    concurrency:
+      group: wordpress-org-georg-kloster-bible-reader-assets
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish assets to WordPress.org
+        uses: 10up/action-wordpress-plugin-asset-update@stable
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: ${{ vars.WORDPRESS_ORG_SLUG }}
+          IGNORE_OTHER_FILES: true
