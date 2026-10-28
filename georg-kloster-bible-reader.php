@@ -3,7 +3,7 @@
  * Plugin Name: Georg Kloster Bible Reader
  * Plugin URI: https://bible-desktop.com/
  * Description: Read and study the Bible, compare translations, and embed passages using Bible Desktop.
- * Version: 1.1.10
+ * Version: 1.1.11
  * Requires at least: 6.5
  * Requires PHP: 8.2
  * Author: Vladimir Atapin
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'GKBR_VERSION', '1.1.10' );
+define( 'GKBR_VERSION', '1.1.11' );
 define( 'GKBR_FILE', __FILE__ );
 define( 'GKBR_DIR', plugin_dir_path( __FILE__ ) );
 define( 'GKBR_URL', plugin_dir_url( __FILE__ ) );

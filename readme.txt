@@ -4,7 +4,7 @@ Tags: bible, bible study, scripture, commentary, shortcode
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 8.2
-Stable tag: 1.1.10
+Stable tag: 1.1.11
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -161,6 +161,13 @@ destructive uninstall routine.
 6. Dictionaries and maps available for the selected translation.
 
 == Changelog ==
+
+= 1.1.11 =
+* Show note markers and expand personal notes directly beneath their verses.
+* Keep commentary and parallel places synchronized with the selected verse; hide book/chapter introductions from verse commentary.
+* Show progress while parallel-place text is being resolved and clarify empty/error results.
+* Load the first available dictionary entries automatically and simplify the verse context menu.
+* Show reading history during the current session when cross-visit history saving is disabled.
 
 = 1.1.10 =
 * Enqueue the legacy admin stylesheet only on its plugin screen.

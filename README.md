@@ -1,7 +1,7 @@
 # Georg Kloster Bible Reader
 
 Bible reading and study plugin for WordPress. Slug, directory and text domain:
-`georg-kloster-bible-reader`. Version: 1.1.10. See [readme.txt](readme.txt)
+`georg-kloster-bible-reader`. Version: 1.1.11. See [readme.txt](readme.txt)
 for installation, external-service disclosure, licensing, and shortcodes.
 
 ## Features
@@ -28,11 +28,15 @@ The following copy is prepared for the localized WordPress.org plugin pages. Sho
 
 **Полное описание:** Georg Kloster Bible Reader — читалка и инструмент для изучения Библии в WordPress. Читайте главы, ищите по тексту, открывайте прямые ссылки на стихи и сравнивайте переводы по сохранённым соответствиям. Используйте комментарии, перекрёстные ссылки, записи Strong, словари и карты атласа. Добавляйте читалку или отдельные отрывки с помощью блоков Gutenberg и шорткодов. Закладки, заметки, выделения, сохранённые отрывки, карточки для запоминания и необязательная история чтения хранятся в браузере. Главы и материалы для изучения кэшируются на сервере; выбранные издания можно загружать небольшими фоновыми пакетами. Ранее импортированные модули BibleQuote доступны через локальную читалку.
 
+**Изменения в версии 1.1.11:** У стихов с заметками появились значок и раскрытие текста прямо под стихом. Толкование привязано к выбранному стиху, параллельные места обновляются с индикатором загрузки. Первая доступная запись словаря загружается автоматически, история видна в текущем сеансе, а пункт словарей убран из меню стиха.
+
 ### Deutsch
 
 **Kurzbeschreibung:** Bibel lesen, Übersetzungen vergleichen, in der Schrift suchen und Bibelstellen in WordPress einbetten.
 
 **Vollständige Beschreibung:** Georg Kloster Bible Reader ist ein Bibellese- und Studienwerkzeug für WordPress. Lesen Sie Kapitel, durchsuchen Sie die Bibel, öffnen Sie direkte Verslinks und vergleichen Sie Übersetzungen anhand gespeicherter Verszuordnungen. Nutzen Sie Kommentare, Querverweise, Strong-Einträge, Wörterbücher und Atlasbilder. Binden Sie den vollständigen Leser oder einzelne Abschnitte mit Gutenberg-Blöcken und Shortcodes ein. Lesezeichen, Notizen, Markierungen, gespeicherte Abschnitte, Lernkarten und der optionale Leseverlauf werden im Browser gespeichert. Kapitel und Studienmaterialien werden auf dem Server zwischengespeichert; ausgewählte Ausgaben lassen sich in kleinen Hintergrundpaketen laden. Bereits importierte BibleQuote-Module bleiben über den lokalen Leser verfügbar.
+
+**Änderungen in Version 1.1.11:** Verse mit Notizen zeigen ein Symbol; der Notiztext lässt sich direkt darunter aufklappen. Kommentare beziehen sich auf den ausgewählten Vers, Parallelstellen werden mit Fortschrittsanzeige neu geladen. Der erste verfügbare Wörterbucheintrag wird automatisch geladen, der Leseverlauf ist während der Sitzung sichtbar und der Wörterbuchpunkt wurde aus dem Versmenü entfernt.
 
 ### Українська
 
@@ -40,11 +44,15 @@ The following copy is prepared for the localized WordPress.org plugin pages. Sho
 
 **Повний опис:** Georg Kloster Bible Reader — читалка та інструмент для вивчення Біблії у WordPress. Читайте розділи, шукайте за текстом, відкривайте прямі посилання на вірші та порівнюйте переклади за збереженими відповідностями. Користуйтеся коментарями, перехресними посиланнями, записами Strong, словниками та зображеннями атласу. Додавайте читалку або окремі уривки за допомогою блоків Gutenberg і шорткодів. Закладки, нотатки, виділення, збережені уривки, картки для запам’ятовування та необов’язкова історія читання зберігаються у браузері. Розділи й матеріали для вивчення кешуються на сервері; вибрані видання можна завантажувати невеликими фоновими пакетами. Раніше імпортовані модулі BibleQuote доступні у локальній читалці.
 
+**Зміни у версії 1.1.11:** Біля віршів із нотатками є значок, а текст можна розгорнути під віршем. Коментарі відповідають вибраному віршу, паралельні місця оновлюються з індикатором завантаження. Перша доступна стаття словника завантажується автоматично, історія читання доступна протягом сеансу, а словники прибрано з контекстного меню вірша.
+
 ### Polski
 
 **Krótki opis:** Czytaj Biblię, porównuj przekłady, szukaj w Piśmie i osadzaj fragmenty na stronie WordPress.
 
 **Pełny opis:** Georg Kloster Bible Reader to czytnik i narzędzie do studiowania Biblii w WordPressie. Czytaj rozdziały, wyszukuj w Piśmie, otwieraj bezpośrednie odnośniki do wersetów i porównuj przekłady według zapisanych odpowiedników. Korzystaj z komentarzy, odsyłaczy, haseł Strong, słowników i map atlasu. Dodaj czytnik lub wybrane fragmenty za pomocą bloków Gutenberg i shortcode’ów. Zakładki, notatki, zaznaczenia, zapisane fragmenty, fiszki i opcjonalna historia czytania są przechowywane w przeglądarce. Rozdziały i materiały do studiowania są buforowane na serwerze; wybrane wydania można pobierać w małych pakietach w tle. Wcześniej zaimportowane moduły BibleQuote pozostają dostępne w lokalnym czytniku.
+
+**Zmiany w wersji 1.1.11:** Wersety z notatkami mają znacznik, a treść można rozwinąć bezpośrednio pod wersetem. Komentarz odpowiada wybranemu wersetowi, a miejsca paralelne odświeżają się ze wskaźnikiem ładowania. Pierwszy dostępny wpis słownika ładuje się automatycznie, historia jest dostępna w bieżącej sesji, a słowniki usunięto z menu wersetu.
 ## Verification
 
 From the repository root:
