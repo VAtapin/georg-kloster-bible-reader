@@ -57,7 +57,7 @@
         try { config = JSON.parse(root.dataset.config); } catch { return; }
         const t = config.ui;
         let current = { ...config.initial }, selected = null, catalog = [], books = [], chapterData = null;
-        let navigation = 0, sideRequest = 0, compareRequest = 0, dictionaryRequest = 0, studyModules = null, dictionaries = null;
+        let navigation = 0, sideRequest = 0, compareRequest = 0, dictionaryRequest = 0, studyModules = null, dictionaries = null, commentaryReload = null, activeSideKind = '';
         let history = [], bookmarks = [], remember = false, lastPlace = null;
         let shell = null, continuous = null;
         const dictionaryState = { module: '', query: '', letter: '', letterLabel: '', mode: 'browser', open: false };
@@ -71,10 +71,10 @@
             remember = saved.remember === true;
             lastPlace = saved.last && typeof saved.last.translation === 'string' && typeof saved.last.book === 'string' && numeric(saved.last.chapter) && numeric(saved.last.verse) ? saved.last : null;
         } catch { /* Storage is optional. */ }
-        function persist() {
+        function persist(notify = false, clearHistory = false) {
             try {
                 localStorage.setItem(storageKey, JSON.stringify({ remember, history: remember ? history : [], bookmarks, last: lastPlace }));
-                window.dispatchEvent(new CustomEvent('gkbr-storage', { detail: storageKey }));
+                if (notify) window.dispatchEvent(new CustomEvent('gkbr-storage', { detail: { key: storageKey, clearHistory } }));
             }
             catch { status.textContent = t.storage; }
         }
@@ -125,7 +125,7 @@
             if (!selected) { status.textContent = t.study; return; }
             const item = { ...current, verse: selected.number, label: title.textContent + ':' + selected.number };
             const key = placeKey(item);
-            bookmarks = [item, ...bookmarks.filter(row => placeKey(row) !== key)].slice(0, 100); persist(); status.textContent = t.bookmarks;
+            bookmarks = [item, ...bookmarks.filter(row => placeKey(row) !== key)].slice(0, 100); persist(true); status.textContent = t.bookmarks;
         }
         button(t.bookmark, saveBookmark);
         button(t.bookmarks, () => showPlaces(bookmarks, t.bookmarks));
@@ -141,12 +141,13 @@
         });
         const rememberInput = element('input', '', { type: 'checkbox' }); rememberInput.checked = remember;
         const rememberLabel = element('label', t.remember); rememberLabel.prepend(rememberInput); actions.append(rememberLabel);
-        rememberInput.addEventListener('change', () => { remember = rememberInput.checked; if (!remember) history = []; persist(); });
+        rememberInput.addEventListener('change', () => { remember = rememberInput.checked; if (!remember) history = []; persist(true, !remember); });
         function syncStorage(event) {
-            if (event.key !== storageKey && event.detail !== storageKey) return;
+            const detail = event.detail && typeof event.detail === 'object' ? event.detail : null;
+            if (event.key !== storageKey && event.detail !== storageKey && detail?.key !== storageKey) return;
             try {
                 const saved = JSON.parse(localStorage.getItem(storageKey) || '{}');
-                history = Array.isArray(saved.history) ? saved.history.slice(0, 50) : [];
+                if (saved.remember === true || detail?.clearHistory === true) history = Array.isArray(saved.history) ? saved.history.slice(0, 50) : [];
                 bookmarks = Array.isArray(saved.bookmarks) ? saved.bookmarks.slice(0, 100) : [];
                 remember = saved.remember === true; rememberInput.checked = remember;
             } catch { /* Optional storage remains local to the reader. */ }
@@ -155,7 +156,7 @@
         window.addEventListener('gkbr-storage', syncStorage, { signal: lifecycle.signal });
         button(t.clear, () => {
             history = []; bookmarks = []; remember = false; rememberInput.checked = false;
-            try { localStorage.removeItem(storageKey); window.dispatchEvent(new CustomEvent('gkbr-storage', { detail: storageKey })); }
+            try { localStorage.removeItem(storageKey); window.dispatchEvent(new CustomEvent('gkbr-storage', { detail: { key: storageKey, clearHistory: true } })); }
             catch { status.textContent = t.storage; }
         });
         const localNote = element('p', t.local, { class: 'gkbr-note' }); root.append(localNote);
@@ -192,14 +193,15 @@
         function record() {
             if (config.passage) return;
             lastPlace = { ...current };
-            if (!remember) { persist(); return; }
             const item = { ...current, label: title.textContent + ':' + (current.verse || 1) };
             history = [item, ...history.filter(row => placeKey(row) !== placeKey(item))].slice(0, 50); persist();
         }
         function openSide(label) {
+            commentaryReload = null;
+            activeSideKind = label;
             side.hidden = false; resizeHandle.hidden = false; side.replaceChildren();
             const header = element('div', '', { class: 'gkbr-actions' });
-            header.append(element('strong', label)); button(t.close, () => { ++sideRequest; side.hidden = true; resizeHandle.hidden = true; }, header); side.append(header);
+            header.append(element('strong', label)); button(t.close, () => { ++sideRequest; commentaryReload = null; activeSideKind = ''; side.hidden = true; resizeHandle.hidden = true; }, header); side.append(header);
         }
         resizeHandle.hidden = true;
         resizeHandle.setAttribute('aria-valuemin', '22'); resizeHandle.setAttribute('aria-valuemax', '55'); resizeHandle.setAttribute('aria-valuenow', '32');
@@ -233,8 +235,8 @@
         }
         async function navigate(position, initial = false, preload = null) {
             continuous?.dispose(); continuous = null;
-            const version = ++navigation; ++sideRequest; ++compareRequest;
-            status.textContent = t.loading; selected = null; side.hidden = true; resizeHandle.hidden = true;
+            const version = ++navigation; ++sideRequest; ++compareRequest; commentaryReload = null;
+            status.textContent = t.loading; selected = null; activeSideKind = ''; side.hidden = true; resizeHandle.hidden = true;
             // Locations coming from personal records must never carry note text into HTTP URLs.
             current = Object.fromEntries(['translation', 'book', 'chapter', 'verse'].map(key => [key, ['string', 'number'].includes(typeof position[key]) ? position[key] : current[key]]));
             if (!catalog.some(row => row.code === current.translation)) { status.textContent = t.empty; error(text, t.empty); return; }
@@ -280,7 +282,7 @@
         }
         function activatePage(position, source, selectedByUser = true) {
             if (current.book !== position.book || Number(current.chapter) !== Number(position.chapter)) {
-                ++sideRequest; selected = null; chapterData = source; current = { ...current, ...position, verse: source.verses[0]?.number || position.verse };
+                ++sideRequest; commentaryReload = null; activeSideKind = ''; selected = null; chapterData = source; current = { ...current, ...position, verse: source.verses[0]?.number || position.verse };
                 text.querySelectorAll('[aria-pressed=true]').forEach(row => row.setAttribute('aria-pressed', 'false'));
                 const book = books.find(item => item.slug === current.book); bookSelect.value = current.book;
                 previous.disabled = current.chapter <= 1; next.disabled = current.chapter >= Number(book?.chapters_count);
@@ -317,6 +319,8 @@
                 const active = row.dataset.location === [current.translation, current.book, current.chapter].join(':') && Number(row.dataset.number) === Number(selected.number); row.setAttribute('aria-pressed', String(active));
                 if (active && scroll) row.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
             }); shell?.update(); record();
+            if (!side.hidden && commentaryReload) commentaryReload();
+            else if (!side.hidden && activeSideKind === t.references) study('references');
         }
         async function compare() {
             const second = compareSelect.value, version = ++compareRequest, nav = navigation;
@@ -385,11 +389,11 @@
             if (!selected) { status.textContent = t.study; return; }
             const verse = selected.id, version = ++sideRequest, translation = current.translation;
             openSide(t[kind] || t.strong);
-            if (kind !== 'references') side.append(element('p', t.loading));
+            if (kind !== 'strong') side.append(element('p', t.loading));
             try {
                 if (kind === 'commentaries') {
                     studyModules ||= (await request(config, 'commentary-modules')).data;
-                    if (version !== sideRequest) return;
+                    if (activeSideKind !== t.commentaries) return;
                     openSide(t.commentaries);
                     const select = element('select', '', { 'aria-label': t.module });
                     options(select, [{ code: '', name: t.none }, ...studyModules], row => row.code, row => row.name + (row.language_name ? ' · ' + row.language_name : ''));
@@ -397,13 +401,15 @@
                     // No commentary in another language is selected silently.
                     const initial = studyModules.find(row => row.code === 'OPTINA_COMMENTARIES' && chapterData.translation.language?.code === 'ru');
                     async function load() {
-                        const token = ++sideRequest, module = select.value; contents.replaceChildren(); if (!module) return;
+                        const token = ++sideRequest, activeVerse = selected?.id, module = select.value; contents.replaceChildren(); if (!module || !activeVerse) return;
                         try {
-                            const result = await request(config, 'commentaries', { verse, module }); if (token !== sideRequest) return;
+                            const result = await request(config, 'commentaries', { verse: activeVerse, module }); if (token !== sideRequest) return;
+                            contents.append(element('p', chapterData.book.name + ' ' + chapterData.chapter.number + ':' + selected.number, { class: 'gkbr-commentary-reference' }));
                             result.data.entries.forEach(entry => { const article = element('article'); article.append(element('h4', entry.title || entry.module_name), element('p', entry.body ?? plain(entry.content))); contents.append(article); });
                             if (!result.data.entries.length) contents.append(element('p', t.empty));
                         } catch (failure) { if (token === sideRequest) error(contents, failure.message, load); }
                     }
+                    commentaryReload = load;
                     select.addEventListener('change', load); if (initial) { select.value = initial.code; load(); }
                 } else if (kind === 'references') {
                     const result = await request(config, 'references', { verse, translation }); if (version !== sideRequest) return;
@@ -450,6 +456,7 @@
                         else article.append(element('strong', label));
                         article.append(element('p', verseText)); side.append(article);
                     }
+                    if (!side.querySelector('.gkbr-reference')) side.append(element('p', t.empty));
                 } else {
                     const result = await request(config, 'tokens', { verse, translation }); if (version !== sideRequest) return;
                     openSide(t.strong);
@@ -465,7 +472,11 @@
                 }
             } catch (failure) {
                 if (version !== sideRequest) return;
-                if (kind === 'references') openSide(t.references);
+                if (kind === 'references') {
+                    openSide(t.references);
+                    side.append(element('p', failure.message));
+                    button(t.retry, () => study(kind), side);
+                }
                 else error(side, failure.message, () => study(kind));
             }
         }

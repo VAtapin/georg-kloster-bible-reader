@@ -296,7 +296,6 @@
             }), panel.body);
             button(t.references, run(() => core(t.references)?.click()), panel.body);
             button(t.history, run(() => core(t.history)?.click()), panel.body);
-            button(t.dictionaries, run(() => openDictionaries?.()), panel.body);
             button(t.commentaries, run(commentary), panel.body);
             button(t.personal, run(() => personal.personal()), panel.body);
         }
