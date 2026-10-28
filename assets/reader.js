@@ -560,8 +560,13 @@
                         try {
                             const result = await request(config, 'dictionary-alphabet', { module: select.value });
                             if (token !== dictionaryRequest || !dictionaryState.open) return;
-                            (Array.isArray(result.data) ? result.data : []).filter(row => Number(row.count) > 0).forEach(row => addLetter(row.label, row.chapter));
-                            if (!alphabet.childElementCount) loadEntries('browse', '');
+                            const sources = (Array.isArray(result.data) ? result.data : []).filter(row => Number(row.count) > 0);
+                            sources.forEach(row => addLetter(row.label, row.chapter));
+                            if (sources.length) {
+                                const selected = sources.find(row => String(row.chapter) === String(dictionaryState.letter)) || sources[0];
+                                dictionaryState.letter = String(selected.chapter); dictionaryState.letterLabel = selected.label;
+                                loadEntries('letter', selected.chapter, selected.label);
+                            } else loadEntries('browse', '');
                         } catch (failure) {
                             if (token === dictionaryRequest) error(results, failure.message, () => { void renderAlphabet(); });
                         }
@@ -573,14 +578,15 @@
                         loadEntries('browse', '');
                         return;
                     }
+                    let firstAvailableLetter = '';
                     try {
                         const firstPage = await request(config, 'dictionary-entries', { module: select.value, q: '', offset: 0 });
                         if (token !== dictionaryRequest || !dictionaryState.open) return;
-                        const startsWithKnownLetter = (Array.isArray(firstPage.data) ? firstPage.data : []).some(row => {
+                        firstAvailableLetter = (Array.isArray(firstPage.data) ? firstPage.data : []).map(row => {
                             const initial = [...String(row.topic || '').trim().normalize('NFC').toLocaleUpperCase()][0] || '';
-                            return letters.includes(initial);
-                        });
-                        if (!startsWithKnownLetter) {
+                            return letters.includes(initial) ? initial : '';
+                        }).find(Boolean) || '';
+                        if (!firstAvailableLetter) {
                             dictionaryState.letter = ''; dictionaryState.letterLabel = '';
                             loadEntries('browse', '', '', firstPage);
                             return;
@@ -589,7 +595,13 @@
                         if (token === dictionaryRequest) error(results, failure.message, () => { void renderAlphabet(); });
                         return;
                     }
+                    const selectedLetter = dictionaryState.letter && letters.includes(dictionaryState.letter)
+                        ? dictionaryState.letter
+                        : firstAvailableLetter;
+                    dictionaryState.letter = selectedLetter;
+                    dictionaryState.letterLabel = selectedLetter;
                     letters.forEach(letter => addLetter(letter, letter));
+                    loadEntries('letter', selectedLetter, selectedLetter);
                 }
                 function loadEntries(mode, term, label = term, firstPage = null) {
                     clearPagination();
