@@ -5,4 +5,4 @@
 - Checks: JavaScript syntax checks, PHP lint, and `git diff --check` passed. No live WordPress/API integration check was run.
 - Known limitation: Dictionaries without a confirmed alphabet offer cards and search instead of a guessed alphabet.
 - Next: Review `georg-kloster-bible-reader-1.1.10-review.zip` before any WordPress.org publication.
-- Last related commit: f5020ac (Improve dictionary browsing and verse references); current review corrections are prepared locally.
+- Last related commit: 7b0ce1b (Improve dictionary cards and alphabet handling).
