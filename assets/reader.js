@@ -233,6 +233,11 @@
             target.replaceChildren(element('p', message));
             if (retry) button(t.retry, retry, target);
         }
+        function loadingIndicator(target) {
+            const indicator = element('p', t.loading, { class: 'gkbr-loading-indicator', role: 'status', 'aria-live': 'polite' });
+            target.append(indicator);
+            return indicator;
+        }
         async function navigate(position, initial = false, preload = null) {
             continuous?.dispose(); continuous = null;
             const version = ++navigation; ++sideRequest; ++compareRequest; commentaryReload = null;
@@ -389,7 +394,7 @@
             if (!selected) { status.textContent = t.study; return; }
             const verse = selected.id, version = ++sideRequest, translation = current.translation;
             openSide(t[kind] || t.strong);
-            if (kind !== 'strong') side.append(element('p', t.loading));
+            if (kind !== 'strong') loadingIndicator(side);
             try {
                 if (kind === 'commentaries') {
                     studyModules ||= (await request(config, 'commentary-modules')).data;
@@ -405,8 +410,15 @@
                         try {
                             const result = await request(config, 'commentaries', { verse: activeVerse, module }); if (token !== sideRequest) return;
                             contents.append(element('p', chapterData.book.name + ' ' + chapterData.chapter.number + ':' + selected.number, { class: 'gkbr-commentary-reference' }));
-                            result.data.entries.forEach(entry => { const article = element('article'); article.append(element('h4', entry.title || entry.module_name), element('p', entry.body ?? plain(entry.content))); contents.append(article); });
-                            if (!result.data.entries.length) contents.append(element('p', t.empty));
+                            const verseEntries = (Array.isArray(result.data.entries) ? result.data.entries : []).filter(entry => {
+                                const chapterFrom = Number(entry.chapter_from), verseFrom = Number(entry.verse_from);
+                                const chapterTo = entry.chapter_to == null ? chapterFrom : Number(entry.chapter_to);
+                                const verseTo = entry.verse_to == null ? verseFrom : Number(entry.verse_to);
+                                return chapterFrom === Number(current.chapter) && verseFrom === Number(selected.number)
+                                    && chapterTo === Number(current.chapter) && verseTo === Number(selected.number);
+                            });
+                            verseEntries.forEach(entry => { const article = element('article'); article.append(element('h4', entry.title || entry.module_name), element('p', entry.body ?? plain(entry.content))); contents.append(article); });
+                            if (!verseEntries.length) contents.append(element('p', t.empty));
                         } catch (failure) { if (token === sideRequest) error(contents, failure.message, load); }
                     }
                     commentaryReload = load;
@@ -414,6 +426,7 @@
                 } else if (kind === 'references') {
                     const result = await request(config, 'references', { verse, translation }); if (version !== sideRequest) return;
                     openSide(t.references);
+                    const loading = loadingIndicator(side);
                     const language = String(chapterData.translation.language?.code || '').toLowerCase().split(/[-_]/u)[0];
                     const references = result.data.references.filter(row => language === 'ru' || !['legacy_quote', 'tsk', 'tsk2'].includes(String(row.source || '').toLowerCase())).slice(0, 12);
                     const rows = references.map(row => ({ row, target: window.gkbrReferenceTarget(row, result.data, { id: verse, osis_ref: selected?.osis_ref, translation }) }));
@@ -457,6 +470,7 @@
                         article.append(element('p', verseText)); side.append(article);
                     }
                     if (!side.querySelector('.gkbr-reference')) side.append(element('p', t.empty));
+                    loading.remove();
                 } else {
                     const result = await request(config, 'tokens', { verse, translation }); if (version !== sideRequest) return;
                     openSide(t.strong);
