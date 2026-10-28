@@ -8,11 +8,11 @@ Stable tag: 1.1.10
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Read the Bible, compare translations, explore commentary and dictionaries, and embed passages using Bible Desktop.
+Read the Bible, compare translations, search Scripture, explore study tools, and embed passages in WordPress.
 
 == Description ==
 
-Georg Kloster Bible Reader connects WordPress to the Bible Desktop content service.
+Georg Kloster Bible Reader is a Bible reading and study plugin for WordPress.
 
 * Choose the translations available to visitors and the default translation.
 * Read chapters, search Scripture, and share direct links to verses.
