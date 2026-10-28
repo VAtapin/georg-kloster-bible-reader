@@ -303,8 +303,10 @@
                 row.dataset.location = [position.translation, position.book, position.chapter].join(':');
                 const displayed = { ...verse, plain_text: verse.plain_text ?? plain(verse.text) };
                 const prefs = shell?.preferences() || { clean: false, paragraphs: true, headings: true, footnotes: true, strongNumbers: true, addedWords: true };
+                const verseMarks = shell?.marks(displayed, position) || [];
+                const verseNotes = shell?.notesFor(displayed, position) || [];
                 const choose = () => { activatePage(position, source); selectVerse(verse.number, false); };
-                const sourceText = window.gkbrSourceText(displayed, prefs, shell?.marks(displayed, position) || [], {
+                const sourceText = window.gkbrSourceText(displayed, prefs, verseMarks, {
                     noteLabel: t.footnotes, footnote: note => { if (shell) shell.footnote(note); else { openSide(t.footnotes); side.append(element('p', note.text || t.sourceAvailable)); } }, strong: number => { choose(); strongEntry(number); } });
                 while (sourceText.firstElementChild?.classList.contains('gkbr-source-heading')) page.append(sourceText.firstElementChild);
                 row.append(element('span', verse.number, { class: 'gkbr-num' }), sourceText);
@@ -312,6 +314,15 @@
                 row.addEventListener('contextmenu', event => { event.preventDefault(); choose(); shell?.verseMenu(); });
                 row.addEventListener('dblclick', () => { choose(); shell?.verseMenu(); });
                 row.addEventListener('keydown', event => { if (['Enter', ' '].includes(event.key) && event.target === row) { event.preventDefault(); choose(); shell?.verseMenu(); } });
+                if (verseNotes.length) {
+                    const disclosure = element('details', '', { class: 'gkbr-verse-note' });
+                    const summary = element('summary');
+                    summary.setAttribute('aria-label', t.notes + ' (' + verseNotes.length + ')');
+                    summary.append(element('span', '✎', { class: 'gkbr-verse-note-icon', 'aria-hidden': 'true' }), document.createTextNode(String(verseNotes.length)));
+                    disclosure.append(summary);
+                    verseNotes.forEach(item => disclosure.append(element('p', item.text, { class: 'gkbr-verse-note-text' })));
+                    page.append(disclosure);
+                }
             });
             if (!verses.length) page.append(element('p', t.empty)); return page;
         }

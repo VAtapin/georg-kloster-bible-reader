@@ -338,6 +338,6 @@
             if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { event.preventDefault(); changeChapter(event.key === 'ArrowRight' ? 1 : -1); }
         }, { signal: api.signal });
         applyPreferences();
-        return { update, verseMenu, footnote, preferences: () => preferences, marks: personal.marks, note: personal.note, personal: personal.personal, refreshPreferences: () => applyPreferences(), setCatalogContext: value => { catalogContext = value; } };
+        return { update, verseMenu, footnote, preferences: () => preferences, marks: personal.marks, notesFor: personal.notesFor, note: personal.note, personal: personal.personal, refreshPreferences: () => applyPreferences(), setCatalogContext: value => { catalogContext = value; } };
     };
 })();

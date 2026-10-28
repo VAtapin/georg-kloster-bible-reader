@@ -86,6 +86,11 @@
 .gkbr-app-reader .gkbr-text { min-height:0;overflow:auto;overscroll-behavior:contain;padding:0 8px 12px;font-family:Georgia,'Times New Roman',serif;font-size:var(--gkbr-size);line-height:var(--gkbr-line);scrollbar-color:#7b9fbc transparent; }
 .gkbr-app-reader .gkbr-verse { color:inherit;cursor:pointer;padding:8px 0 !important;border:0 !important;line-height:var(--gkbr-line);white-space:pre-wrap; }
 .gkbr-app-reader .gkbr-verse[aria-pressed=true] { border:0 !important;background:#e5edf4 !important;border-radius:4px !important; }
+.gkbr-app-reader .gkbr-verse-note { margin:-5px 0 10px;padding-inline-start:30px;color:var(--gkbr-muted);font:14px/1.45 system-ui,sans-serif; }
+.gkbr-app-reader .gkbr-verse-note summary { display:inline-flex;align-items:center;gap:6px;min-height:28px;cursor:pointer; }
+.gkbr-app-reader .gkbr-verse-note-icon { font-size:17px; }
+.gkbr-app-reader .gkbr-verse-note-text { margin:4px 0 8px;padding:8px 10px;border-inline-start:3px solid var(--gkbr-muted);border-radius:4px;background:#f3f7fa;color:var(--gkbr-ink);white-space:pre-wrap;overflow-wrap:anywhere; }
+.gkbr-app-reader[data-night=true] .gkbr-verse-note-text { background:#25394e; }
 .gkbr-app-reader .gkbr-num { font:700 .6em/1 system-ui,sans-serif;color:var(--gkbr-muted);vertical-align:super;margin-inline-end:10px; }
 .gkbr-app-reader .gkbr-side { min-height:0;max-height:none;overflow:auto;padding:12px;border-color:var(--gkbr-border); }
 .gkbr-app-reader .gkbr-loading-indicator { display:flex;align-items:center;gap:9px; }

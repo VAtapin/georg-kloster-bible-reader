@@ -47,6 +47,13 @@
             read(); return state.marks.filter(mark => identity(mark) === identity({ ...position, verse: verse.number }) && typeof mark.start === 'number' && typeof mark.end === 'number'
                 && mark.start >= 0 && mark.end > mark.start && mark.end <= (verse.plain_text || '').length && verse.plain_text.slice(mark.start, mark.end) === mark.quote);
         }
+        function notesFor(verse, position) {
+            const key = identity({ ...position, verse: verse.number });
+            return [
+                ...state.notes.filter(item => identity(item) === key && typeof item.note === 'string' && item.note.trim()).map(item => ({ text: item.note })),
+                ...state.marks.filter(item => identity(item) === key && typeof item.note === 'string' && item.note.trim()).map(item => ({ text: item.note }))
+            ];
+        }
         function personal() {
             read(); const spot = place(); if (!spot) { message(t.study); return; }
             const selection = String(window.getSelection()?.toString() || '').trim();
@@ -123,6 +130,6 @@
             read(); const href = URL.createObjectURL(new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' }));
             const link = node('a', '', { href, download: 'bible-reader-personal-study.json' }); root.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(href), 1000);
         }
-        return { note, notes, personal, library, marks, exportData };
+        return { note, notes, personal, library, marks, notesFor, exportData };
     };
 })();
