@@ -59,7 +59,8 @@
         let navigation = 0, sideRequest = 0, compareRequest = 0, dictionaryRequest = 0, studyModules = null, dictionaries = null;
         let history = [], bookmarks = [], remember = false, lastPlace = null;
         let shell = null, continuous = null;
-        const dictionaryState = { module: '', query: '', entry: null, mode: 'browser', open: false };
+        const dictionaryState = { module: '', query: '', letter: '', entry: null, mode: 'browser', open: false };
+        let dictionaryObserver = null, dictionarySearchTimer = 0;
         lifecycle.signal.addEventListener('abort', () => continuous?.dispose());
         const storageKey = 'gkbr:' + location.pathname;
         try {
@@ -98,6 +99,7 @@
         }
         function button(label, handler, parent = actions) {
             const node = element('button', label, { type: 'button', 'aria-label': label });
+            node.title = label;
             node.addEventListener('click', handler); parent.append(node); return node;
         }
         function options(select, rows, value, label, initial = '') {
@@ -482,6 +484,8 @@
         }
         function returnToBible() {
             ++dictionaryRequest;
+            clearTimeout(dictionarySearchTimer); dictionarySearchTimer = 0;
+            dictionaryObserver?.disconnect(); dictionaryObserver = null;
             dictionaryState.open = false;
             dictionaryPane.hidden = true;
             text.hidden = false;
@@ -492,6 +496,8 @@
         }
         async function dictionaryBrowser() {
             showDictionaryPane();
+            clearTimeout(dictionarySearchTimer); dictionarySearchTimer = 0;
+            dictionaryObserver?.disconnect(); dictionaryObserver = null;
             const version = ++dictionaryRequest;
             dictionaryState.mode = 'browser';
             dictionaryPane.replaceChildren();
@@ -511,30 +517,124 @@
                 else dictionaryState.module = select.value;
                 dictionaryState.module = select.value;
                 const input = element('input', '', { type: 'search', maxlength: 120, 'aria-label': t.search, placeholder: t.search });
+                input.setAttribute('aria-autocomplete', 'list');
                 input.value = dictionaryState.query;
-                const searchButton = button(t.search, () => loadEntries(0), controls);
                 controls.prepend(select, input);
-                const results = element('div', '', { class: 'gkbr-dictionary-results' });
-                dictionaryPane.replaceChildren(header, controls, results);
-                async function loadEntries(offset) {
-                    const token = ++dictionaryRequest, module = select.value;
-                    dictionaryState.module = module; dictionaryState.query = input.value.trim();
-                    results.replaceChildren(element('p', t.loading));
-                    try {
-                        const result = await request(config, 'dictionary-entries', { module, q: dictionaryState.query, offset });
-                        if (token !== dictionaryRequest || dictionaryState.open === false) return;
-                        results.replaceChildren();
-                        result.data.forEach(row => button(row.topic, () => dictionaryEntry(module, row.key || row.id), results));
-                        if (!result.data.length) results.append(element('p', t.empty));
-                        if (offset + result.data.length < Number(result.total || 0)) button(t.more, () => loadEntries(offset + 30), results);
-                    } catch (failure) { if (token === dictionaryRequest) error(results, failure.message, () => loadEntries(offset)); }
+                const alphabet = element('nav', '', { class: 'gkbr-dictionary-alphabet', 'aria-label': t.dictionaries });
+                const results = element('div', '', { class: 'gkbr-dictionary-results', role: 'listbox' });
+                dictionaryPane.replaceChildren(header, controls, alphabet, results);
+                let scrollListener = null;
+                function alphabetFor(module) {
+                    const code = String(module?.definition_language || module?.language_code || module?.language?.code || '').toLowerCase().split(/[-_]/u)[0];
+                    const alphabets = {
+                        ru: 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ',
+                        uk: 'АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ',
+                        pl: 'AĄBCĆDEĘFGHIJKLŁMNŃOÓPRSŚTUWYZŹŻ',
+                        de: 'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ',
+                        en: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+                    };
+                    return [...(alphabets[code] || 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')];
                 }
-                select.addEventListener('change', () => { dictionaryState.module = select.value; dictionaryState.entry = null; loadEntries(0); });
-                input.addEventListener('input', () => { dictionaryState.query = input.value; });
-                input.addEventListener('keydown', event => { if (event.key === 'Enter') { event.preventDefault(); loadEntries(0); } });
-                searchButton.disabled = !modules.length;
-                if (select.value) loadEntries(0);
-                else results.append(element('p', t.empty));
+                function clearPagination() {
+                    dictionaryObserver?.disconnect(); dictionaryObserver = null;
+                    if (scrollListener) dictionaryPane.removeEventListener('scroll', scrollListener);
+                    scrollListener = null;
+                }
+                function renderAlphabet() {
+                    clearPagination(); ++dictionaryRequest;
+                    dictionaryState.mode = 'browser'; dictionaryState.letter = '';
+                    alphabet.replaceChildren(); results.replaceChildren();
+                    const module = modules.find(row => row.code === select.value);
+                    alphabetFor(module).forEach(letter => {
+                        const choice = button(letter, () => {
+                            clearTimeout(dictionarySearchTimer); dictionarySearchTimer = 0;
+                            dictionaryState.query = ''; dictionaryState.letter = letter; input.value = '';
+                            loadEntries('letter', letter);
+                        }, alphabet);
+                        choice.setAttribute('aria-pressed', String(letter === dictionaryState.letter));
+                    });
+                }
+                function loadEntries(mode, term) {
+                    clearPagination();
+                    const token = ++dictionaryRequest, module = select.value;
+                    dictionaryState.module = module; dictionaryState.mode = mode;
+                    dictionaryState.query = mode === 'search' ? term : '';
+                    dictionaryState.letter = mode === 'letter' ? term : '';
+                    if (mode === 'search') alphabet.replaceChildren();
+                    else alphabet.querySelectorAll('button').forEach(choice => choice.setAttribute('aria-pressed', String(choice.textContent === term)));
+                    results.replaceChildren();
+                    const list = element('div', '', { class: 'gkbr-dictionary-results-list' });
+                    const sentinel = element('p', t.loading, { class: 'gkbr-dictionary-sentinel', 'aria-live': 'polite' });
+                    results.append(list, sentinel);
+                    let offset = 0, total = Infinity, busy = false, done = false;
+                    async function loadNext() {
+                        if (busy || done) return;
+                        sentinel.replaceChildren(element('span', t.loading));
+                        busy = true;
+                        try {
+                            do {
+                                const result = await request(config, 'dictionary-entries', { module, q: term, offset });
+                                if (token !== dictionaryRequest || !dictionaryState.open) return;
+                                const rows = Array.isArray(result.data) ? result.data : [];
+                                if (!rows.length) done = true;
+                                offset += rows.length; total = Number(result.total || 0);
+                                const matches = mode === 'letter'
+                                    ? rows.filter(row => String(row.topic || '').trim().normalize('NFC').toLocaleUpperCase().startsWith(term))
+                                    : rows;
+                                matches.forEach(row => {
+                                    const choice = button(row.topic, () => dictionaryEntry(module, row.key || row.id), list);
+                                    choice.setAttribute('role', 'option');
+                                });
+                                if (offset >= total || offset >= 10000) done = true;
+                                if (mode !== 'letter' || list.childElementCount >= 20 || done) break;
+                            } while (token === dictionaryRequest);
+                            if (token !== dictionaryRequest) return;
+                            busy = false;
+                            if (done) {
+                                dictionaryObserver?.disconnect(); dictionaryObserver = null;
+                                sentinel.remove();
+                                if (!list.childElementCount) results.replaceChildren(element('p', t.empty));
+                            } else if (!dictionaryObserver && window.IntersectionObserver) {
+                                dictionaryObserver = new IntersectionObserver(entries => {
+                                    if (entries.some(entry => entry.isIntersecting)) loadNext();
+                                }, { root: dictionaryPane, rootMargin: '220px' });
+                                dictionaryObserver.observe(sentinel);
+                            }
+                        } catch (failure) {
+                            if (token !== dictionaryRequest) return;
+                            dictionaryObserver?.disconnect(); dictionaryObserver = null;
+                            busy = false; error(sentinel, failure.message, loadNext);
+                        }
+                    }
+                    if (window.IntersectionObserver) {
+                        dictionaryObserver = new IntersectionObserver(entries => {
+                            if (entries.some(entry => entry.isIntersecting)) loadNext();
+                        }, { root: dictionaryPane, rootMargin: '220px' });
+                        dictionaryObserver.observe(sentinel);
+                    } else {
+                        scrollListener = () => {
+                            if (dictionaryPane.scrollTop + dictionaryPane.clientHeight >= dictionaryPane.scrollHeight - 240) loadNext();
+                        };
+                        dictionaryPane.addEventListener('scroll', scrollListener, { passive: true });
+                    }
+                    loadNext();
+                }
+                select.addEventListener('change', () => {
+                    dictionaryState.module = select.value; dictionaryState.query = ''; dictionaryState.letter = ''; dictionaryState.entry = null;
+                    input.value = ''; renderAlphabet();
+                });
+                input.addEventListener('input', () => {
+                    clearTimeout(dictionarySearchTimer); dictionaryState.query = input.value.trim();
+                    if (!dictionaryState.query) { renderAlphabet(); return; }
+                    dictionarySearchTimer = setTimeout(() => loadEntries('search', dictionaryState.query), 250);
+                });
+                input.addEventListener('keydown', event => {
+                    if (event.key === 'Enter' && input.value.trim()) { event.preventDefault(); clearTimeout(dictionarySearchTimer); loadEntries('search', input.value.trim()); }
+                });
+                if (!modules.length) { alphabet.replaceChildren(); results.replaceChildren(element('p', t.empty)); }
+                else if (dictionaryState.query) loadEntries('search', dictionaryState.query);
+                else if (dictionaryState.letter) loadEntries('letter', dictionaryState.letter);
+                else renderAlphabet();
             } catch (failure) { if (version === dictionaryRequest) error(dictionaryPane, failure.message, dictionaryBrowser); }
         }
         const dictionaryAliases = {
@@ -571,13 +671,17 @@
                 body.replaceChildren();
                 const from = Number(ref.verse_from || 1), to = Number(ref.verse_to || from);
                 body.append(element('h3', result.data.book.name + ' ' + ref.chapter_number + ':' + from + (to !== from ? '–' + to : '')));
-                const verses = result.data.verses.filter(row => Number(row.number) >= from && Number(row.number) <= to);
-                for (const verse of verses) {
+                let highlighted = null;
+                for (const verse of result.data.verses) {
                     const line = element('p', '', { class: 'gkbr-dictionary-verse' });
+                    const isTarget = Number(verse.number) >= from && Number(verse.number) <= to;
+                    line.setAttribute('aria-current', String(isTarget));
+                    if (isTarget && !highlighted) highlighted = line;
                     line.append(element('sup', verse.number), document.createTextNode(' ' + plain(verse.plain_text ?? verse.text)));
                     body.append(line);
                 }
-                if (!verses.length) body.append(element('p', t.empty));
+                highlighted?.scrollIntoView({ block: 'center' });
+                if (!result.data.verses.length) body.append(element('p', t.empty));
             } catch (failure) { body.replaceChildren(element('p', failure.message)); }
         }
         function appendLinkedDictionaryBody(parent, body, references) {
@@ -606,6 +710,8 @@
             return used;
         }
         async function dictionaryEntry(module, entry) {
+            clearTimeout(dictionarySearchTimer); dictionarySearchTimer = 0;
+            dictionaryObserver?.disconnect(); dictionaryObserver = null;
             const version = ++dictionaryRequest;
             showDictionaryPane(); dictionaryState.mode = 'entry'; dictionaryState.module = module; dictionaryState.entry = entry;
             dictionaryPane.replaceChildren(element('p', t.loading));

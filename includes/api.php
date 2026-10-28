@@ -134,7 +134,7 @@ function gkbr_dispatch( array $input ) {
 			$params = array(
 				'q'      => $query,
 				'limit'  => 30,
-				'offset' => min( 10000, max( 0, (int) gkbr_input( $input, 'offset' ) ) ),
+				'offset' => min( 1000000, max( 0, (int) gkbr_input( $input, 'offset' ) ) ),
 			);
 			break;
 		case 'dictionary-entry':

@@ -63,8 +63,14 @@
 .gkbr-dictionary-toolbar button,.gkbr-dictionary-controls button,.gkbr-dictionary-results button,.gkbr-dictionary-reference-list button,.gkbr-dictionary-crosslinks button { min-height:40px; }
 .gkbr-dictionary-controls { display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;margin:12px 0; }
 .gkbr-dictionary-controls select,.gkbr-dictionary-controls input { min-width:0;padding:8px; }
-.gkbr-dictionary-results { display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:8px; }
-.gkbr-dictionary-results > button,.gkbr-dictionary-reference-list > button,.gkbr-dictionary-crosslinks > button { text-align:start;padding:8px; }
+.gkbr-dictionary-alphabet { display:grid;grid-template-columns:repeat(auto-fill,minmax(36px,1fr));gap:4px;margin:8px 0; }
+.gkbr-dictionary-alphabet button { min-height:38px;padding:4px; }
+.gkbr-dictionary-alphabet button[aria-pressed=true] { background:#e5edf4;border-color:#7897ae; }
+.gkbr-dictionary-results { display:block; }
+.gkbr-dictionary-results-list { display:grid;grid-template-columns:minmax(0,1fr); }
+.gkbr-dictionary-results-list > button { text-align:start;padding:8px 4px;min-height:42px;border:0;border-bottom:1px solid var(--gkbr-border);border-radius:0;background:transparent; }
+.gkbr-dictionary-sentinel { text-align:center;padding:8px; }
+.gkbr-dictionary-reference-list > button,.gkbr-dictionary-crosslinks > button { text-align:start;padding:8px; }
 .gkbr-dictionary-article { max-width:100%;padding:12px 0; }
 .gkbr-dictionary-body { white-space:pre-wrap;overflow-wrap:anywhere; }
 .gkbr-app-reader .gkbr-dictionary-body .gkbr-inline-reference { display:inline;color:#2f6386;text-decoration:underline;text-underline-offset:2px;min-height:0;padding:0 1px;border:0;background:transparent;font:inherit;cursor:pointer; }
@@ -73,12 +79,15 @@
 .gkbr-dictionary-reference-list h3 { flex-basis:100%;font-size:15px; }
 .gkbr-dictionary-article img { display:block;max-width:100%;height:auto;margin:12px auto; }
 .gkbr-dictionary-verse { white-space:pre-wrap;overflow-wrap:anywhere; }
+.gkbr-dialog-body .gkbr-dictionary-verse { margin:0;padding:4px 8px;border-radius:4px;line-height:1.45; }
+.gkbr-dialog-body .gkbr-dictionary-verse[aria-current=true] { background:#e5edf4; }
+.gkbr-app-reader[data-night=true] .gkbr-dialog-body .gkbr-dictionary-verse[aria-current=true] { background:#2d4157; }
 .gkbr-app-reader .gkbr-text { min-height:0;overflow:auto;overscroll-behavior:contain;padding:0 8px 12px;font-family:Georgia,'Times New Roman',serif;font-size:var(--gkbr-size);line-height:var(--gkbr-line);scrollbar-color:#7b9fbc transparent; }
 .gkbr-app-reader .gkbr-verse { color:inherit;cursor:pointer;padding:8px 0 !important;border:0 !important;line-height:var(--gkbr-line);white-space:pre-wrap; }
 .gkbr-app-reader .gkbr-verse[aria-pressed=true] { border:0 !important;background:#e5edf4 !important;border-radius:4px !important; }
 .gkbr-app-reader .gkbr-num { font:700 .6em/1 system-ui,sans-serif;color:var(--gkbr-muted);vertical-align:super;margin-inline-end:10px; }
 .gkbr-app-reader .gkbr-side { min-height:0;max-height:none;overflow:auto;padding:12px;border-color:var(--gkbr-border); }
-.gkbr-app-reader .gkbr-bottom { display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;background:var(--gkbr-paper);border-top:1px solid var(--gkbr-border);padding:8px 4px;flex-shrink:0; }
+.gkbr-app-reader .gkbr-bottom { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;background:var(--gkbr-paper);border-top:1px solid var(--gkbr-border);padding:8px 4px;flex-shrink:0; }
 .gkbr-app-reader[data-bottom=no] .gkbr-bottom { display:none; }
 .gkbr-app-reader[data-bottom=no] .gkbr-header { grid-template-columns:28px 28px minmax(0,1fr) 32px 32px 32px 32px 32px 32px 28px; }
 .gkbr-bottom button { font-size:12px;padding:6px 2px;min-height:40px;border:0 !important;background:transparent !important; }
@@ -97,6 +106,7 @@
 .gkbr-dialog > header { display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px; }
 .gkbr-dialog > header button { width:44px;height:44px; }
 .gkbr-dialog-body { display:grid;gap:8px; }
+.gkbr-dialog-body:has(.gkbr-dictionary-verse) { gap:2px; }
 .gkbr-dialog-body > button { text-align:start;min-height:44px; }
 .gkbr-dialog-body label { display:grid;gap:4px;min-width:0; }
 .gkbr-dialog-body input,.gkbr-dialog-body select,.gkbr-dialog-body textarea { width:100%;font:inherit;min-width:0;padding:8px; }

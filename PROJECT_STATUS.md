@@ -1,8 +1,8 @@
 # Project status
 
-- State: Georg Kloster Bible Reader 1.1.10 remains published. Dictionary workspace changes are prepared locally as a review build; no version bump or publication was made.
-- Implemented: dictionary browsing and entries use the main reading area and independent state, so Bible navigation and verse selection do not control them. Verse-specific commentary remains in the right pane, which can be resized and remembers its width. Dictionary Bible references open the matching passage in a popup; structured references not matched inline remain clickable below the article. Changed reader assets use file modification times for cache refresh without changing the plugin version.
-- Checks: JavaScript syntax checks, PHP lint, `git diff --check`, and a reference matcher smoke check passed. No live WordPress integration check was run; the plugin was not uploaded or published.
-- Known issue: inline citation links require an exact match with structured references supplied by the API; remaining structured references are shown as clickable fallback links.
-- Next: review `georg-kloster-bible-reader-1.1.10-review.zip` and send feedback before any publication.
-- Last related commit: d72650c (Publish plugin directory screenshots).
+- State: Georg Kloster Bible Reader 1.1.10 is unchanged; this review build has not been uploaded or published to WordPress.org.
+- Implemented: Dictionary browsing is in the main reader area with independent state, automatic search suggestions, language-aware alphabet selection, and scroll-based result loading. Bible references open the full chapter with the referenced verse or range highlighted. Toolbar buttons have hover labels, unavailable Audio was removed, and verse spacing in the reference popup was tightened. Commentary remains in the resizable right pane.
+- Checks: JavaScript syntax checks, PHP lint, and `git diff --check` passed. No live WordPress integration check was run.
+- Known issue: Inline dictionary citations link when they match structured API references; other structured references appear in a clickable fallback list.
+- Next: Review `georg-kloster-bible-reader-1.1.10-review.zip` before any WordPress.org publication.
+- Last related commit: b3fe130 (Move dictionary browsing into the reader pane); current review changes are not committed yet.

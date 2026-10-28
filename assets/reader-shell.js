@@ -16,10 +16,12 @@
         root.classList.add('gkbr-app-reader');
         const header = node('header', '', { class: 'gkbr-header' }), footer = node('nav', '', { class: 'gkbr-bottom', 'aria-label': t.reader });
         const center = node('button', '', { type: 'button', class: 'gkbr-center', 'aria-label': t.choosePlace });
+        center.title = t.choosePlace;
         const editionTitle = node('small'), bookTitle = node('strong'), positionTitle = node('span'); center.append(editionTitle, bookTitle, positionTitle);
         const actionMap = new Map([...actions.querySelectorAll('button'), ...tools.querySelectorAll('button')].map(item => [item.getAttribute('aria-label'), item]));
         const core = label => actionMap.get(label);
         const previous = core(t.previous), next = core(t.next);
+        previous.title = t.previous; next.title = t.next;
         core(t.commentaries)?.remove(); core(t.bookmark)?.remove();
         function icon(target, path, caption = '') {
             const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg'), shape = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -87,14 +89,12 @@
             const action = core(label); if (action) footer.append(action);
         }
         const notesButton = button(t.notes, () => personal.notes(), footer); notesButton.className = 'gkbr-notes-button';
-        const audio = button(t.audio, () => {}, footer); audio.disabled = true; audio.title = t.audioUnavailable;
         const more = button(t.moreActions, () => verseMenu(), footer);
         icon(core(t.bookmarks), 'M6 3h12v18l-6-4-6 4z', t.bookmarks);
         icon(notesButton, 'M5 3h14v18H5zM8 7h8M8 11h8M8 15h5', t.notes);
-        icon(audio, 'M3 9h4l5-4v14l-5-4H3zM16 8q6 4 0 8', t.audio);
         icon(core(t.share), 'M8 11l8-5M8 13l8 5M6 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6M18 3a3 3 0 1 0 0 6 3 3 0 0 0 0-6M18 15a3 3 0 1 0 0 6 3 3 0 0 0 0-6', t.nativeShare);
         icon(more, 'M4 6h16M4 12h16M4 18h16M8 4v4m8 2v4m-6 2v4', t.moreActions);
-        footer.replaceChildren(core(t.bookmarks), notesButton, audio, core(t.share), more); root.append(footer);
+        footer.replaceChildren(core(t.bookmarks), notesButton, core(t.share), more); root.append(footer);
         core(t.share).addEventListener('click', event => {
             event.preventDefault(); event.stopImmediatePropagation(); const chapter = getChapter(), place = getPlace(); if (!chapter) return;
             const panel = dialog(t.nativeShare), url = new URL(location.href); url.hash = '';
