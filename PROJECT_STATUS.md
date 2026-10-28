@@ -5,4 +5,4 @@
 - Checks: JavaScript syntax checks, PHP lint, and `git diff --check` passed. No live WordPress integration check was run.
 - Known issue: Inline dictionary citations link when they match structured API references; other structured references appear in a clickable fallback list.
 - Next: Review `georg-kloster-bible-reader-1.1.10-review.zip` before any WordPress.org publication.
-- Last related commit: b3fe130 (Move dictionary browsing into the reader pane); current review changes are not committed yet.
+- Last related commit: f5020ac (Improve dictionary browsing and verse references).
