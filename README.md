@@ -104,4 +104,8 @@ Its actions remain available from **More** in the header. The full reader
 uses the browser viewport height. The header's full-screen button opens the
 same reader above the WordPress page and returns it to its original position.
 
-Packaging does not create Git tags, GitHub releases, SVN uploads, deployments, or submissions.
+Release publication is handled by the GitHub Actions workflow described below.
+
+## Release workflow
+
+An annotated version tag (`X.Y.Z`) starts `.github/workflows/deploy-wordpress.yml`. The workflow checks that the tag matches the plugin header and `Stable tag` in `readme.txt`, deploys the tagged source to WordPress.org using the repository's `SVN_USERNAME` and `SVN_PASSWORD` secrets and `WORDPRESS_ORG_SLUG` variable, and creates a GitHub Release with the generated plugin ZIP. Repository-only files are excluded by `.distignore`.
