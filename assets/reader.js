@@ -20,7 +20,7 @@
         url.searchParams.set('action', 'gkbr_read');
         url.searchParams.set('kind', kind);
         Object.entries(params).forEach(([key, value]) => url.searchParams.set(key, String(value)));
-        const reusable = kind !== 'search' && kind !== 'dictionary-entries';
+        const reusable = kind !== 'search' && (kind !== 'dictionary-entries' || !params.q);
         const key = url.href;
         const hit = reusable && responseCache.get(key);
         if (hit && hit.until > Date.now()) {
@@ -526,7 +526,6 @@
                 let scrollListener = null;
                 function alphabetFor(module) {
                     const code = String(module?.language_code || '').toLowerCase().split(/[-_]/u)[0];
-                    if (/strong|стронг/iu.test(String(module?.code || '') + ' ' + String(module?.name || ''))) return null;
                     const alphabets = {
                         ru: 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ',
                         uk: 'АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ',
@@ -561,7 +560,7 @@
                         try {
                             const result = await request(config, 'dictionary-alphabet', { module: select.value });
                             if (token !== dictionaryRequest || !dictionaryState.open) return;
-                            (Array.isArray(result.data) ? result.data : []).forEach(row => addLetter(row.label, row.chapter));
+                            (Array.isArray(result.data) ? result.data : []).filter(row => Number(row.count) > 0).forEach(row => addLetter(row.label, row.chapter));
                             if (!alphabet.childElementCount) loadEntries('browse', '');
                         } catch (failure) {
                             if (token === dictionaryRequest) error(results, failure.message, () => { void renderAlphabet(); });
@@ -574,9 +573,25 @@
                         loadEntries('browse', '');
                         return;
                     }
+                    try {
+                        const firstPage = await request(config, 'dictionary-entries', { module: select.value, q: '', offset: 0 });
+                        if (token !== dictionaryRequest || !dictionaryState.open) return;
+                        const startsWithKnownLetter = (Array.isArray(firstPage.data) ? firstPage.data : []).some(row => {
+                            const initial = [...String(row.topic || '').trim().normalize('NFC').toLocaleUpperCase()][0] || '';
+                            return letters.includes(initial);
+                        });
+                        if (!startsWithKnownLetter) {
+                            dictionaryState.letter = ''; dictionaryState.letterLabel = '';
+                            loadEntries('browse', '', '', firstPage);
+                            return;
+                        }
+                    } catch (failure) {
+                        if (token === dictionaryRequest) error(results, failure.message, () => { void renderAlphabet(); });
+                        return;
+                    }
                     letters.forEach(letter => addLetter(letter, letter));
                 }
-                function loadEntries(mode, term, label = term) {
+                function loadEntries(mode, term, label = term, firstPage = null) {
                     clearPagination();
                     const token = ++dictionaryRequest, module = select.value;
                     const moduleRow = modules.find(row => row.code === module);
@@ -601,7 +616,9 @@
                         try {
                             do {
                                 let result;
-                                if (cuLexicon) {
+                                if (firstPage) {
+                                    result = firstPage; firstPage = null;
+                                } else if (cuLexicon) {
                                     const params = { module, offset };
                                     if (mode === 'letter') params.letter = term;
                                     else params.q = term;
