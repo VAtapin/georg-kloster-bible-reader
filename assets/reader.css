@@ -67,8 +67,9 @@
 .gkbr-dictionary-alphabet button { min-height:38px;padding:4px; }
 .gkbr-dictionary-alphabet button[aria-pressed=true] { background:#e5edf4;border-color:#7897ae; }
 .gkbr-dictionary-results { display:block; }
-.gkbr-dictionary-results-list { display:grid;grid-template-columns:minmax(0,1fr); }
-.gkbr-dictionary-results-list > button { text-align:start;padding:8px 4px;min-height:42px;border:0;border-bottom:1px solid var(--gkbr-border);border-radius:0;background:transparent; }
+.gkbr-dictionary-results-list { display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr));gap:8px; }
+.gkbr-dictionary-results-list > button { text-align:start;padding:8px;min-height:44px;overflow-wrap:anywhere; }
+.gkbr-app-reader .gkbr-dictionary-results-list[lang^="cu"],.gkbr-app-reader .gkbr-dictionary-body[lang^="cu"],.gkbr-app-reader .gkbr-dialog header strong[lang^="cu"] { font-family:"GKBR Monomakh","Monomakh Unicode",serif; }
 .gkbr-dictionary-sentinel { text-align:center;padding:8px; }
 .gkbr-dictionary-reference-list > button,.gkbr-dictionary-crosslinks > button { text-align:start;padding:8px; }
 .gkbr-dictionary-article { max-width:100%;padding:12px 0; }

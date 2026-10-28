@@ -1,8 +1,8 @@
 # Project status
 
-- State: Georg Kloster Bible Reader 1.1.10 is unchanged; this review build has not been uploaded or published to WordPress.org.
-- Implemented: Dictionary browsing is in the main reader area with independent state, automatic search suggestions, language-aware alphabet selection, and scroll-based result loading. Bible references open the full chapter with the referenced verse or range highlighted. Toolbar buttons have hover labels, unavailable Audio was removed, and verse spacing in the reference popup was tightened. Commentary remains in the resizable right pane.
-- Checks: JavaScript syntax checks, PHP lint, and `git diff --check` passed. No live WordPress integration check was run.
-- Known issue: Inline dictionary citations link when they match structured API references; other structured references appear in a clickable fallback list.
+- State: Georg Kloster Bible Reader 1.1.10 is prepared as a local review build; it has not been uploaded or published to WordPress.org.
+- Implemented: Dictionary words appear as cards and open in a popup while preserving the list. Dictionary article responses are kept in a bounded browser cache for 15 minutes. Alphabet selection is limited to known text alphabets, uses Bible Desktop's alphabet/search endpoints for the Church Slavonic lexicon, and is disabled for Strong-number dictionaries and unknown languages. Church Slavonic headwords and articles use Monomakh. Bible references still open the full chapter with the referenced verses highlighted; commentary stays in the resizable right pane.
+- Checks: JavaScript syntax checks, PHP lint, and `git diff --check` passed. No live WordPress/API integration check was run.
+- Known limitation: Dictionaries without a confirmed alphabet offer cards and search instead of a guessed alphabet.
 - Next: Review `georg-kloster-bible-reader-1.1.10-review.zip` before any WordPress.org publication.
-- Last related commit: f5020ac (Improve dictionary browsing and verse references).
+- Last related commit: f5020ac (Improve dictionary browsing and verse references); current review corrections are prepared locally.

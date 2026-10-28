@@ -137,6 +137,25 @@ function gkbr_dispatch( array $input ) {
 				'offset' => min( 1000000, max( 0, (int) gkbr_input( $input, 'offset' ) ) ),
 			);
 			break;
+		case 'dictionary-alphabet':
+			if ( ! gkbr_code( $module ) ) {
+				break; }
+			$path = 'dictionaries/' . rawurlencode( $module ) . '/alphabet';
+			break;
+		case 'dictionary-search':
+			$letter = gkbr_input( $input, 'letter' );
+			if ( ! gkbr_code( $module ) || strlen( $query ) > 120 || ( '' !== $letter && ( ! ctype_digit( $letter ) || (int) $letter < 1 || (int) $letter > 36 ) ) ) {
+				break; }
+			$path   = 'dictionaries/' . rawurlencode( $module ) . '/search';
+			$params = array(
+				'q'      => $query,
+				'mode'   => 'word',
+				'limit'  => 30,
+				'offset' => min( 1000000, max( 0, (int) gkbr_input( $input, 'offset' ) ) ),
+			);
+			if ( '' !== $letter ) {
+				$params['letter'] = (int) $letter; }
+			break;
 		case 'dictionary-entry':
 			$entry = gkbr_input( $input, 'entry' );
 			if ( ! gkbr_code( $module ) || ! preg_match( '/^(?:[a-f0-9]{40}|[0-9]{1,10})$/D', $entry ) ) {

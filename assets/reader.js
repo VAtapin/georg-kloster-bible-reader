@@ -37,8 +37,9 @@
             return payload.data;
         })();
         if (reusable) {
-            responseCache.set(key, { promise: pending, until: Date.now() + 60_000 });
-            if (responseCache.size > 8) responseCache.delete(responseCache.keys().next().value);
+            const ttl = kind === 'dictionary-entry' ? 15 * 60_000 : 60_000;
+            responseCache.set(key, { promise: pending, until: Date.now() + ttl });
+            if (responseCache.size > 64) responseCache.delete(responseCache.keys().next().value);
         }
         try { return await pending; }
         catch (failure) {
@@ -59,8 +60,8 @@
         let navigation = 0, sideRequest = 0, compareRequest = 0, dictionaryRequest = 0, studyModules = null, dictionaries = null;
         let history = [], bookmarks = [], remember = false, lastPlace = null;
         let shell = null, continuous = null;
-        const dictionaryState = { module: '', query: '', letter: '', entry: null, mode: 'browser', open: false };
-        let dictionaryObserver = null, dictionarySearchTimer = 0;
+        const dictionaryState = { module: '', query: '', letter: '', letterLabel: '', mode: 'browser', open: false };
+        let dictionaryObserver = null, dictionarySearchTimer = 0, dictionaryEntryDialog = null, dictionaryEntryRequest = 0;
         lifecycle.signal.addEventListener('abort', () => continuous?.dispose());
         const storageKey = 'gkbr:' + location.pathname;
         try {
@@ -491,8 +492,7 @@
             text.hidden = false;
         }
         function openDictionaryView() {
-            if (dictionaryState.mode === 'entry' && dictionaryState.module && dictionaryState.entry) dictionaryEntry(dictionaryState.module, dictionaryState.entry);
-            else dictionaryBrowser();
+            dictionaryBrowser();
         }
         async function dictionaryBrowser() {
             showDictionaryPane();
@@ -525,7 +525,8 @@
                 dictionaryPane.replaceChildren(header, controls, alphabet, results);
                 let scrollListener = null;
                 function alphabetFor(module) {
-                    const code = String(module?.definition_language || module?.language_code || module?.language?.code || '').toLowerCase().split(/[-_]/u)[0];
+                    const code = String(module?.language_code || '').toLowerCase().split(/[-_]/u)[0];
+                    if (/strong|стронг/iu.test(String(module?.code || '') + ' ' + String(module?.name || ''))) return null;
                     const alphabets = {
                         ru: 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ',
                         uk: 'АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ',
@@ -533,35 +534,61 @@
                         de: 'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ',
                         en: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
                     };
-                    return [...(alphabets[code] || 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')];
+                    return alphabets[code] ? [...alphabets[code]] : null;
                 }
                 function clearPagination() {
                     dictionaryObserver?.disconnect(); dictionaryObserver = null;
                     if (scrollListener) dictionaryPane.removeEventListener('scroll', scrollListener);
                     scrollListener = null;
                 }
-                function renderAlphabet() {
+                async function renderAlphabet() {
                     clearPagination(); ++dictionaryRequest;
-                    dictionaryState.mode = 'browser'; dictionaryState.letter = '';
+                    const token = dictionaryRequest;
+                    dictionaryState.mode = 'browser';
                     alphabet.replaceChildren(); results.replaceChildren();
                     const module = modules.find(row => row.code === select.value);
-                    alphabetFor(module).forEach(letter => {
-                        const choice = button(letter, () => {
+                    const addLetter = (label, value) => {
+                        const choice = button(label, () => {
                             clearTimeout(dictionarySearchTimer); dictionarySearchTimer = 0;
-                            dictionaryState.query = ''; dictionaryState.letter = letter; input.value = '';
-                            loadEntries('letter', letter);
+                            dictionaryState.query = ''; dictionaryState.letter = String(value); dictionaryState.letterLabel = label; input.value = '';
+                            loadEntries('letter', String(value), label);
                         }, alphabet);
-                        choice.setAttribute('aria-pressed', String(letter === dictionaryState.letter));
-                    });
+                        choice.dataset.value = String(value);
+                        choice.setAttribute('aria-pressed', String(String(value) === dictionaryState.letter));
+                    };
+                    const code = String(module?.language_code || '').toLowerCase().split(/[-_]/u)[0];
+                    if (code === 'cu' && module?.kind === 'lexicon') {
+                        try {
+                            const result = await request(config, 'dictionary-alphabet', { module: select.value });
+                            if (token !== dictionaryRequest || !dictionaryState.open) return;
+                            (Array.isArray(result.data) ? result.data : []).forEach(row => addLetter(row.label, row.chapter));
+                            if (!alphabet.childElementCount) loadEntries('browse', '');
+                        } catch (failure) {
+                            if (token === dictionaryRequest) error(results, failure.message, () => { void renderAlphabet(); });
+                        }
+                        return;
+                    }
+                    const letters = alphabetFor(module);
+                    if (!letters) {
+                        dictionaryState.letter = ''; dictionaryState.letterLabel = '';
+                        loadEntries('browse', '');
+                        return;
+                    }
+                    letters.forEach(letter => addLetter(letter, letter));
                 }
-                function loadEntries(mode, term) {
+                function loadEntries(mode, term, label = term) {
                     clearPagination();
                     const token = ++dictionaryRequest, module = select.value;
+                    const moduleRow = modules.find(row => row.code === module);
+                    const language = String(moduleRow?.language_code || '').toLowerCase();
+                    const cuLexicon = language.split(/[-_]/u)[0] === 'cu' && moduleRow?.kind === 'lexicon';
+                    alphabet.lang = language; results.lang = language;
                     dictionaryState.module = module; dictionaryState.mode = mode;
                     dictionaryState.query = mode === 'search' ? term : '';
-                    dictionaryState.letter = mode === 'letter' ? term : '';
+                    dictionaryState.letter = mode === 'letter' ? String(term) : '';
+                    dictionaryState.letterLabel = mode === 'letter' ? label : '';
                     if (mode === 'search') alphabet.replaceChildren();
-                    else alphabet.querySelectorAll('button').forEach(choice => choice.setAttribute('aria-pressed', String(choice.textContent === term)));
+                    else alphabet.querySelectorAll('button').forEach(choice => { choice.setAttribute('aria-pressed', choice.dataset.value === String(term) ? 'true' : 'false'); });
                     results.replaceChildren();
                     const list = element('div', '', { class: 'gkbr-dictionary-results-list' });
                     const sentinel = element('p', t.loading, { class: 'gkbr-dictionary-sentinel', 'aria-live': 'polite' });
@@ -573,16 +600,22 @@
                         busy = true;
                         try {
                             do {
-                                const result = await request(config, 'dictionary-entries', { module, q: term, offset });
+                                let result;
+                                if (cuLexicon) {
+                                    const params = { module, offset };
+                                    if (mode === 'letter') params.letter = term;
+                                    else params.q = term;
+                                    result = await request(config, 'dictionary-search', params);
+                                } else result = await request(config, 'dictionary-entries', { module, q: term, offset });
                                 if (token !== dictionaryRequest || !dictionaryState.open) return;
                                 const rows = Array.isArray(result.data) ? result.data : [];
                                 if (!rows.length) done = true;
                                 offset += rows.length; total = Number(result.total || 0);
-                                const matches = mode === 'letter'
-                                    ? rows.filter(row => String(row.topic || '').trim().normalize('NFC').toLocaleUpperCase().startsWith(term))
+                                const matches = mode === 'letter' && !cuLexicon
+                                    ? rows.filter(row => String(row.topic || '').trim().normalize('NFC').toLocaleUpperCase().startsWith(String(term).toLocaleUpperCase()))
                                     : rows;
                                 matches.forEach(row => {
-                                    const choice = button(row.topic, () => dictionaryEntry(module, row.key || row.id), list);
+                                    const choice = button(row.topic || row.headword, () => dictionaryEntry(module, row.key || row.id), list);
                                     choice.setAttribute('role', 'option');
                                 });
                                 if (offset >= total || offset >= 10000) done = true;
@@ -620,12 +653,12 @@
                     loadNext();
                 }
                 select.addEventListener('change', () => {
-                    dictionaryState.module = select.value; dictionaryState.query = ''; dictionaryState.letter = ''; dictionaryState.entry = null;
-                    input.value = ''; renderAlphabet();
+                    dictionaryState.module = select.value; dictionaryState.query = ''; dictionaryState.letter = ''; dictionaryState.letterLabel = '';
+                    input.value = ''; void renderAlphabet();
                 });
                 input.addEventListener('input', () => {
                     clearTimeout(dictionarySearchTimer); dictionaryState.query = input.value.trim();
-                    if (!dictionaryState.query) { renderAlphabet(); return; }
+                    if (!dictionaryState.query) { void renderAlphabet(); return; }
                     dictionarySearchTimer = setTimeout(() => loadEntries('search', dictionaryState.query), 250);
                 });
                 input.addEventListener('keydown', event => {
@@ -633,8 +666,11 @@
                 });
                 if (!modules.length) { alphabet.replaceChildren(); results.replaceChildren(element('p', t.empty)); }
                 else if (dictionaryState.query) loadEntries('search', dictionaryState.query);
-                else if (dictionaryState.letter) loadEntries('letter', dictionaryState.letter);
-                else renderAlphabet();
+                else {
+                    const selectedLetter = dictionaryState.letter, selectedLabel = dictionaryState.letterLabel;
+                    await renderAlphabet();
+                    if (selectedLetter) loadEntries('letter', selectedLetter, selectedLabel);
+                }
             } catch (failure) { if (version === dictionaryRequest) error(dictionaryPane, failure.message, dictionaryBrowser); }
         }
         const dictionaryAliases = {
@@ -710,40 +746,53 @@
             return used;
         }
         async function dictionaryEntry(module, entry) {
-            clearTimeout(dictionarySearchTimer); dictionarySearchTimer = 0;
-            dictionaryObserver?.disconnect(); dictionaryObserver = null;
-            const version = ++dictionaryRequest;
-            showDictionaryPane(); dictionaryState.mode = 'entry'; dictionaryState.module = module; dictionaryState.entry = entry;
-            dictionaryPane.replaceChildren(element('p', t.loading));
+            const version = ++dictionaryEntryRequest;
+            if (!dictionaryEntryDialog?.isConnected) {
+                const panel = document.createElement('dialog'); panel.className = 'gkbr-dialog'; panel.setAttribute('aria-label', t.dictionaries);
+                const header = element('header'), heading = element('strong'); header.append(heading);
+                const close = button(t.close, () => panel.close(), header);
+                close.textContent = '×'; panel.append(header, element('div', '', { class: 'gkbr-dialog-body gkbr-dictionary-entry-content' }));
+                const body = panel.lastElementChild;
+                panel.addEventListener('click', event => { if (event.target === panel) panel.close(); });
+                panel.addEventListener('close', () => {
+                    if (dictionaryEntryDialog === panel) dictionaryEntryDialog = null;
+                    ++dictionaryEntryRequest; panel.remove();
+                }, { once: true });
+                root.append(panel); panel.showModal(); dictionaryEntryDialog = panel;
+            }
+            const panel = dictionaryEntryDialog, heading = panel.querySelector('header strong'), body = panel.querySelector('.gkbr-dictionary-entry-content');
+            if (!panel.open) panel.showModal();
+            heading.textContent = t.loading; body.replaceChildren(element('p', t.loading));
             try {
-                const result = await request(config, 'dictionary-entry', { module, entry }); if (version !== dictionaryRequest || !dictionaryState.open) return;
+                const result = await request(config, 'dictionary-entry', { module, entry }); if (version !== dictionaryEntryRequest || !panel.open) return;
                 const data = result.data;
-                const header = element('div', '', { class: 'gkbr-dictionary-toolbar' });
-                button(t.dictionaries, dictionaryBrowser, header); header.append(element('strong', data.topic || t.dictionaries)); button(t.reader, returnToBible, header);
+                const language = String(dictionaries.find(row => row.code === module)?.language_code || '').toLowerCase();
+                heading.lang = language; heading.textContent = data.topic || t.dictionaries;
+                body.replaceChildren();
                 const article = element('article', '', { class: 'gkbr-dictionary-article' });
-                const body = element('div', '', { class: 'gkbr-dictionary-body' });
+                const articleBody = element('div', '', { class: 'gkbr-dictionary-body' }); articleBody.lang = language;
                 const references = Array.isArray(data.references) ? data.references.filter(ref => ref && typeof ref.book_slug === 'string' && numeric(ref.chapter_number) && numeric(ref.verse_from)) : [];
-                const linked = appendLinkedDictionaryBody(body, data.body, references);
-                article.append(body);
+                const linked = appendLinkedDictionaryBody(articleBody, data.body, references);
+                article.append(articleBody);
                 (data.media || []).forEach(media => {
                     if (!numeric(media.id)) return;
                     const url = new URL(config.ajax, location.href); url.searchParams.set('action', 'gkbr_media'); url.searchParams.set('module', module); url.searchParams.set('media', media.id);
                     article.append(element('img', '', { src: url.href, alt: data.topic || '', loading: 'lazy' }));
                 });
-                dictionaryPane.replaceChildren(header, article);
+                body.append(article);
                 const unlinked = references.filter((ref, index) => !linked.has(index));
                 if (unlinked.length) {
                     const section = element('section', '', { class: 'gkbr-dictionary-reference-list' }); section.append(element('h3', t.references));
                     unlinked.forEach(ref => button(formatDictionaryReference(ref), () => openDictionaryReference(ref), section));
-                    dictionaryPane.append(section);
+                    body.append(section);
                 }
                 const links = Array.isArray(data.links) ? data.links : [];
                 if (links.length) {
                     const section = element('section', '', { class: 'gkbr-dictionary-crosslinks' });
                     links.forEach(link => { if (link.key) button(link.label || link.topic, () => dictionaryEntry(module, link.key), section); });
-                    dictionaryPane.append(section);
+                    body.append(section);
                 }
-            } catch (failure) { if (version === dictionaryRequest) error(dictionaryPane, failure.message, () => dictionaryEntry(module, entry)); }
+            } catch (failure) { if (version === dictionaryEntryRequest && panel.open) error(body, failure.message, () => dictionaryEntry(module, entry)); }
         }
         compareSelect.addEventListener('change', compare);
         request(config, 'catalog').then(result => {
